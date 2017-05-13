@@ -1,5 +1,13 @@
 package mc.raytracer
 
+import mc.raytracer.gui.MainWindow
+import java.time.Duration
+import java.util.concurrent.TimeUnit
+import javax.swing.SwingUtilities
+
 fun main(args: Array<String>) {
-    println("Hello, world!")
+    SwingUtilities.invokeLater {
+        val mainWindow = MainWindow()
+        mainWindow.isVisible = true
+    }
 }
