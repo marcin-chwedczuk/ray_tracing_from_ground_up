@@ -1,22 +1,19 @@
 package mc.raytracer.gui
 
-import java.awt.Canvas
+import mc.raytracer.util.RawBitmap
+import sun.swing.SwingUtilities2
 import java.awt.Color
 import java.awt.Graphics
-import java.awt.color.ColorSpace
 import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import javax.swing.JFrame
 import javax.swing.JPanel
-import java.awt.image.WritableRaster
 import java.awt.image.ColorModel
 import java.util.*
+import javax.swing.SwingUtilities
 
 
-class MainWindow : JFrame {
-    constructor() : super() {
-        initUI()
-    }
+class MainWindow : JFrame() {
+    init { initUI() }
 
     fun initUI() {
         title = "Ray Tracer"
@@ -32,14 +29,21 @@ class MainWindow : JFrame {
         val image = BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied, null)
 
         val rand = Random()
-        val imageData = IntArray(800*640)
-        for (index in imageData.indices) {
-            // Format ARGB
-            // val color = 0xFF00FF00.toInt()
-            val color = (0xFF000000 or rand.nextLong()).toInt()
-            imageData[index] = color
+        val bitmap = RawBitmap(800, 640)
+
+        fun generateBitmap() {
+            for (row in 0 until bitmap.heigh) {
+                for (col in 0 until bitmap.width) {
+                    // Format ARGB
+                    // val color = 0xFF00FF00.toInt()
+                    val color = (0xFF000000 or rand.nextLong()).toInt()
+                    bitmap.setPixel(row, col, color)
+                }
+            }
         }
-        raster.setDataElements(0,0,800,640,imageData)
+
+        generateBitmap()
+        raster.setDataElements(0, 0, 800, 640, bitmap.rawArgbData)
 
         val panel = object : JPanel() {
             override fun paintComponent(g: Graphics?) {
@@ -47,13 +51,13 @@ class MainWindow : JFrame {
 
                 g!!.color = Color.RED
                 g.drawImage(image, 0, 0, 800, 640, null)
+
             }
         }
-
-        // panel.background = Color.BLACK
         add(panel)
 
-        val timer = javax.swing.Timer(500, {
+        /*var update: Runnable? = null
+        update = Runnable {
             for (index in imageData.indices) {
                 // Format ARGB
                 // val color = 0xFF00FF00.toInt()
@@ -63,6 +67,19 @@ class MainWindow : JFrame {
 
             raster.setDataElements(0,0,800,640,imageData)
             panel.paintImmediately(0,0,800,640)
+
+            Thread.sleep(0)
+            SwingUtilities.invokeLater(update)
+        }
+
+        update.run() */
+
+        // panel.background = Color.BLACK
+
+        val timer = javax.swing.Timer(200, {
+            generateBitmap()
+            raster.setDataElements(0, 0, 800, 640, bitmap.rawArgbData)
+            panel.paintImmediately(0, 0, 800, 640)
         })
 
         timer.start()
