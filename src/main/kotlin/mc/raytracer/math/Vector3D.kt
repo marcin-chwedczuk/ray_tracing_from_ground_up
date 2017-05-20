@@ -13,10 +13,10 @@ class Vector3D(val x: Double, val y:Double, val z:Double) {
     val lengthSquared: Double
         get() = x*x + y*y + z*z
 
-    fun dot(other: Vector3D)
+    infix fun dot(other: Vector3D)
         = x*other.x + y*other.y + z*other.z
 
-    fun dot(other: Normal3D)
+    infix fun dot(other: Normal3D)
         = x*other.x + y*other.y + z*other.z
 
     fun cross(other: Vector3D)

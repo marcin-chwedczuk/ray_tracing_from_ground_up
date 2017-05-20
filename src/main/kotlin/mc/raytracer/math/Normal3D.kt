@@ -6,6 +6,9 @@ class Normal3D(val x: Double, val y:Double, val z:Double) {
     constructor(x: Int, y: Int, z: Int)
         : this(x.toDouble(), y.toDouble(), z.toDouble())
 
+    constructor(vec: Vector3D)
+        : this(vec.x, vec.y, vec.z)
+
     val length: Double
         get() = Math.sqrt(x*x + y*y + z*z)
 
