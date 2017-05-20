@@ -35,7 +35,7 @@ class Sphere(
                 objectHit = true,
                 normalAtHitPoint = Normal3D((temp + ray.direction*t)/radius),
                 localHitPoint = ray.origin+ray.direction*t,
-                color = RgbColor()))
+                material = material))
         }
 
         // larger root
@@ -45,7 +45,7 @@ class Sphere(
                 objectHit = true,
                 normalAtHitPoint = Normal3D((temp + ray.direction*t)/radius),
                 localHitPoint = ray.origin+ray.direction*t,
-                color = RgbColor()))
+                material = material))
         }
 
         return Miss.instance

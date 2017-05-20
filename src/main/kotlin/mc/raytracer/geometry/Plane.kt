@@ -22,7 +22,7 @@ class Plane(
             return Hit(t, ShadingInfo(
                 objectHit=true,
                 localHitPoint=ray.origin + ray.direction*t,
-                color=RgbColor(),
+                material=material,
                 normalAtHitPoint=n))
         }
 

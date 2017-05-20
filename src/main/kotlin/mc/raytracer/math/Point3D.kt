@@ -55,6 +55,12 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
 
     operator fun times(scale: Double)
         = Point3D(x*scale, y*scale, z*scale)
+
+    // companion object ----------------------------------
+
+    companion object {
+        val zero = Point3D(0.0, 0.0, 0.0)
+    }
 }
 
 operator fun Double.times(point: Point3D)

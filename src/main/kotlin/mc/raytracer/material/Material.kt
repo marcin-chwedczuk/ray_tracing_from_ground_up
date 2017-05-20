@@ -1,3 +1,8 @@
 package mc.raytracer.material
 
-class Material
+import mc.raytracer.util.RgbColor
+import mc.raytracer.util.ShadingInfo
+
+interface Material {
+    fun shade(info: ShadingInfo): RgbColor
+}

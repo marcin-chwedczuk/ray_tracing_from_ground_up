@@ -1,5 +1,6 @@
 package mc.raytracer.world
 
+import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
@@ -18,7 +19,11 @@ class World(
         tracer.init(this)
     }
 
-    var sphere: Sphere = Sphere(Point3D(0,0,0), 100.0)
+    val objects: ArrayList<GeometricObject> = ArrayList()
+
+    fun addObject(obj: GeometricObject) {
+        objects.add(obj)
+    }
 
     fun renderScene() {
         val pixelSize = viewPlane.pixelSize
@@ -30,7 +35,7 @@ class World(
         for (r in 0 until vres) {
             for (c in 0 until hres) {
                 val x = pixelSize * (c - hres/2.0 + 0.5)
-                val y = pixelSize * (r - vres/2.0 + 0.5)
+                val y = pixelSize * (vres/2.0 + 0.5 - r)
                 val z = 1000.0
 
                 val ray = Ray(Point3D(x,y,z), vecZ)
