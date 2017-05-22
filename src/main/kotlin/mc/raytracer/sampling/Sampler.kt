@@ -17,7 +17,7 @@ abstract class Sampler(val numberOfSamples: Int = 1,
     abstract fun generateSamples()
 
     fun generateSuffledIndices(): IntArray {
-        val singleSetIndices = (1..numberOfSamples).toMutableList()
+        val singleSetIndices = (0 until numberOfSamples).toMutableList()
         val indices = ArrayList<Int>(numberOfSamples*numberOfSets)
 
         for (i in 1..numberOfSets) {
@@ -36,7 +36,7 @@ abstract class Sampler(val numberOfSamples: Int = 1,
         if ((count % numberOfSamples) == 0) {
             jump = (GlobalRandom.nextInt() % numberOfSets) * numberOfSamples
         }
-        return samples[jump + (count++ % numberOfSamples)]
+        return samples[jump + shuffledIndices[jump + (count++ % numberOfSamples)]]
     }
 
     protected fun shuffleXCoordinates() {
