@@ -1,5 +1,9 @@
 package mc.raytracer.world
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex
+import mc.raytracer.antialiasing.JitteredAntialiasingStrategy
+import mc.raytracer.antialiasing.RandomAntialiasingStrategy
+import mc.raytracer.antialiasing.RegularAntialiasingStrategy
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.math.Point3D
@@ -34,13 +38,23 @@ class World(
 
         for (r in 0 until vres) {
             for (c in 0 until hres) {
-                val x = pixelSize * (c - hres/2.0 + 0.5)
-                val y = pixelSize * (vres/2.0 + 0.5 - r)
-                val z = 1000.0
 
-                val ray = Ray(Point3D(x,y,z), vecZ)
-                val color = tracer.traceRay(ray)
-                displayPixel(r,c,color)
+                var pixelColor = RgbColor.black
+
+                for (sample in 1..viewPlane.numerOfSamplesPerPixel) {
+
+                    val p = viewPlane.sampler.sampleUnitSquare()
+
+                    val x = pixelSize * (c - hres / 2.0 + p.x)
+                    val y = pixelSize * (vres / 2.0 - r + p.y)
+                    val z = 280.0
+
+                    val ray = Ray(Point3D(x, y, z), vecZ)
+                    pixelColor += tracer.traceRay(ray)
+                }
+                pixelColor /= viewPlane.numerOfSamplesPerPixel.toDouble()
+
+                displayPixel(r,c,pixelColor)
             }
         }
     }

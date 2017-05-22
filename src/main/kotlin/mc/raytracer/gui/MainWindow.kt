@@ -28,7 +28,7 @@ class MainWindow : JFrame() {
         this.bufferedImage = BufferedImage(colorModel, raster, colorModel.isAlphaPremultiplied, null)
         this.bitmap = bitmap
 
-        setSize(bitmap.width, bitmap.heigh)
+        // setSize(bitmap.width, bitmap.heigh)
     }
 
     private fun updateBufferedImage() {
@@ -59,7 +59,7 @@ class MainWindow : JFrame() {
                 // TODO: Make screen black or pink
 
                 g!!.color = Color.RED
-                g.drawImage(buff, 0, 0, buff.width, buff.height, null)
+                g.drawImage(buff, 0, 0, 800, 640, null)
             }
         }
         add(panel)

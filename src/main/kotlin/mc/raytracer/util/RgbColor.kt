@@ -58,6 +58,11 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         val yellow = RgbColor(1.0,1.0,0.0)
         val green = RgbColor(0.0, 1.0, 0.0)
         val blue = RgbColor(0.0, 0.0, 1.0)
+
+        fun grayscale(value: Double): RgbColor {
+            val clamped = value.clamp(0.0, 1.0)
+            return RgbColor(clamped, clamped, clamped)
+        }
     }
 }
 
