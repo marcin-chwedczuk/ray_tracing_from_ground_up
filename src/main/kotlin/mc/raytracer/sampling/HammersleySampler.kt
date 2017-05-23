@@ -2,18 +2,20 @@ package mc.raytracer.sampling
 
 import mc.raytracer.math.Point2D
 
-class HammersleySampler(numberOfSamples: Int,
-                        numberOfSets: Int = Sampler.DEFAULT_NUMBER_OF_SETS)
-    : Sampler(numberOfSamples, numberOfSets) {
+class HammersleySampler(numberOfSamples: Int = BaseSampler.DEFAULT_NUMBER_OF_SAMPLES,
+                        numberOfSets: Int = BaseSampler.DEFAULT_NUMBER_OF_SETS)
+    : SquareSampler(numberOfSamples, numberOfSets) {
 
-    override fun generateSamples() {
+    init { generateSamples() }
+
+    private fun generateSamples() {
         for (i in 1..numberOfSets) {
             for (j in 1..numberOfSamples) {
                 val sample = Point2D(
                         j.toDouble()/numberOfSamples,
                         phi(j))
 
-                samples.add(sample)
+                squareSamples.add(sample)
             }
         }
     }

@@ -43,7 +43,7 @@ class World(
 
                 for (sample in 1..viewPlane.numerOfSamplesPerPixel) {
 
-                    val p = viewPlane.sampler.sampleUnitSquare()
+                    val p = viewPlane.sampler.nextSample()
 
                     val x = pixelSize * (c - hres / 2.0 + p.x)
                     val y = pixelSize * (vres / 2.0 - r + p.y)

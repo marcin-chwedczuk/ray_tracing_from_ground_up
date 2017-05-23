@@ -9,7 +9,9 @@ import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point2D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Vector3D
+import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.HammersleySampler
+import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.NRooksSampler
 import mc.raytracer.tracers.SingleSphereTracer
 import mc.raytracer.util.RawBitmap
@@ -40,8 +42,6 @@ fun main(args: Array<String>) {
     // viewPlane.useSampler(HammersleySampler(16))
 
     viewPlane.setNumberOfSamples(16)
-
-    viewPlane.sampler.generateSamples()
 
     val tracer = SingleSphereTracer()
     val world = World(viewPlane, RgbColor.black, tracer, bitmap)

@@ -2,7 +2,7 @@ package mc.raytracer.world
 
 import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.sampling.RegularSampler
-import mc.raytracer.sampling.Sampler
+import mc.raytracer.sampling.SquareSampler
 
 class ViewPlane(
         val horizontalResolution: Int,
@@ -11,7 +11,7 @@ class ViewPlane(
         var gamma: Double = 1.0,
         var showOutOfGamutErrors: Boolean = false
 ) {
-    lateinit var sampler: Sampler
+    lateinit var sampler: SquareSampler
         private set
 
     val numerOfSamplesPerPixel: Int
@@ -24,7 +24,7 @@ class ViewPlane(
         setNumberOfSamples(1)
     }
 
-    fun useSampler(sampler: Sampler) {
+    fun useSampler(sampler: SquareSampler) {
         this.sampler = sampler
     }
 
