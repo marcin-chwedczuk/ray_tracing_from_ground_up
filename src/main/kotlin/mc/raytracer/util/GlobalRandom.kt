@@ -22,4 +22,8 @@ object GlobalRandom {
 
     fun nextDouble()
         = rnd.nextDouble()
+
+    fun shuffle(list: List<*>) {
+        Collections.shuffle(list, rnd)
+    }
 }

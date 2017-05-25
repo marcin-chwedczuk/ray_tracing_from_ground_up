@@ -17,7 +17,7 @@ open class BaseSampler(
         val indices = ArrayList<Int>(numberOfSamples*numberOfSets)
 
         for (i in 1..numberOfSets) {
-            Collections.shuffle(singleSetIndices)
+            GlobalRandom.shuffle(singleSetIndices)
             indices.addAll(singleSetIndices)
         }
 

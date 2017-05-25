@@ -19,7 +19,7 @@ class Vector3D(val x: Double, val y:Double, val z:Double) {
     infix fun dot(other: Normal3D)
         = x*other.x + y*other.y + z*other.z
 
-    fun cross(other: Vector3D)
+    infix fun cross(other: Vector3D)
         = Vector3D(
             y*other.z - z*other.y,
             z*other.x - x*other.z,
@@ -61,6 +61,12 @@ class Vector3D(val x: Double, val y:Double, val z:Double) {
 
     operator fun div(scalar: Double)
         = Vector3D(x/scalar, y/scalar, z/scalar)
+
+    // companion object ---------------------------------------
+
+    companion object {
+        val zero = Vector3D(0,0,0)
+    }
 }
 
 operator fun Double.times(vec: Vector3D)
