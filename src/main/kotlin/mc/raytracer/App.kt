@@ -7,10 +7,7 @@ import mc.raytracer.geometry.Sphere
 import mc.raytracer.gui.MainWindow
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.StaticColorMaterial
-import mc.raytracer.math.Normal3D
-import mc.raytracer.math.Point2D
-import mc.raytracer.math.Point3D
-import mc.raytracer.math.Vector3D
+import mc.raytracer.math.*
 import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.HammersleySampler
 import mc.raytracer.sampling.HemisphereSampler
@@ -20,6 +17,7 @@ import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.ViewPlane
 import mc.raytracer.world.World
+import org.omg.PortableServer.POA
 import java.awt.event.KeyEvent
 import java.awt.event.WindowEvent
 import java.time.Duration
@@ -52,7 +50,9 @@ fun main(args: Array<String>) {
 
     val tracer = SingleSphereTracer()
     val camera = PinholeCamera(bitmap)
-    camera.viewPlaneDistance = 100.0
+    camera.viewPlaneDistance = 400.0
+
+
     val world = World(viewPlane, RgbColor.black, tracer, camera)
 
     val rnd = Random()
@@ -87,6 +87,9 @@ fun main(args: Array<String>) {
         }
 
         override fun run() {
+            var rotateRight = Matrix4.rotationMatrix(Vector3D.axisY, angleInDegrees=-5.0)
+            var rotateLeft = Matrix4.rotationMatrix(Vector3D.axisY, angleInDegrees=5.0)
+
             while (true) {
                 Thread.sleep(10)
 
@@ -95,7 +98,7 @@ fun main(args: Array<String>) {
                      generateBitmap()
                 }
                 else {
-                    val step = 37
+                    val step = 37.0
                     when (keyCode) {
                         KeyEvent.VK_Q -> {
                             SwingUtilities.invokeAndWait {
@@ -105,32 +108,49 @@ fun main(args: Array<String>) {
                         }
 
                         KeyEvent.VK_RIGHT -> {
-                            camera.eye = camera.eye + Vector3D(step,0,0)
+                            val lookAtVec = camera.lookAt - camera.eye
+                            val rotatedLookAtVec = rotateRight*lookAtVec
+                            camera.lookAt = camera.eye + rotatedLookAtVec
                         }
 
                         KeyEvent.VK_LEFT -> {
-                            camera.eye = camera.eye - Vector3D(step,0,0)
+                            val lookAtVec = camera.lookAt - camera.eye
+                            val rotatedLookAtVec = rotateLeft*lookAtVec
+                            camera.lookAt = camera.eye + rotatedLookAtVec
                         }
 
                         KeyEvent.VK_UP -> {
-                            camera.eye = camera.eye + Vector3D(0,step,0)
-
+                            val lookAtVec = (camera.lookAt - camera.eye).norm() * step
+                            camera.lookAt = camera.lookAt + lookAtVec
+                            camera.eye = camera.eye + lookAtVec
                         }
 
                         KeyEvent.VK_DOWN -> {
-                            camera.eye = camera.eye - Vector3D(0,step,0)
+                            val lookAtVec = (camera.lookAt - camera.eye).norm() * step
+                            camera.lookAt = camera.lookAt - lookAtVec
+                            camera.eye = camera.eye - lookAtVec
                         }
 
-                        KeyEvent.VK_W -> {
-                            camera.eye = camera.eye + (camera.lookAt - camera.eye).norm()*step.toDouble()
+                        KeyEvent.VK_D -> {
+                            val delta = camera.cameraRight*step
+                            camera.eye = camera.eye + delta
+                            camera.lookAt = camera.lookAt + delta
                         }
 
-                        KeyEvent.VK_S -> {
-                            camera.eye = camera.eye - (camera.lookAt - camera.eye).norm()*step.toDouble()
+                        KeyEvent.VK_A -> {
+                            val delta = -camera.cameraRight*step
+                            camera.eye = camera.eye + delta
+                            camera.lookAt = camera.lookAt + delta
+                        }
+
+                        KeyEvent.VK_R -> {
+                            camera.rollAngleInDegrees += 5.0
+                        }
+                        KeyEvent.VK_T -> {
+                            camera.rollAngleInDegrees -= 5.0
                         }
                     }
 
-                    camera.lookAt = camera.eye + Vector3D(0,0,-100)
                     println("eye: ${camera.eye}, lookAt: ${camera.lookAt}")
                 }
             }

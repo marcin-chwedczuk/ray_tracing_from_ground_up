@@ -72,5 +72,24 @@ class Matrix4 {
             0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0
         ))
+
+        fun rotationMatrix(axis: Vector3D, angleInDegrees: Double): Matrix4 {
+            // derived using formula: https://en.wikipedia.org/wiki/Rotation_matrix
+
+            // @formatter:off
+            val angle = angleInDegrees.degToRad()
+            val u = axis.norm()
+            val x = u.x; val y = u.y; val z = u.z
+
+            val sin = Math.sin(angle); val cos = Math.cos(angle)
+
+            return Matrix4(arrayOf(
+                x*x*(1-cos)+cos,   x*y*(1-cos)-z*sin, x*z*(1-cos)+y*sin, 0.0,
+                y*x*(1-cos)+z*sin, y*y*(1-cos)+cos,   y*z*(1-cos)-x*sin, 0.0,
+                z*x*(1-cos)-y*sin, z*y*(1-cos)+x*sin, z*z*(1-cos)+cos,   0.0,
+                0.0,               0.0,               0.0,               0.0
+            ))
+            // @formatter:on
+        }
     }
 }

@@ -31,7 +31,7 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
     }
 
     override fun toString()
-        = "point3($x, $y, $z)"
+        = "point3(%.3f, %.3f, %.3f)".format(x,y,z)
 
     // operators ----------------------------------
 
