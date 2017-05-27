@@ -6,7 +6,8 @@ import mc.raytracer.math.Ray
 import mc.raytracer.util.RgbColor
 
 abstract class GeometricObject {
-    var material: Material = StaticColorMaterial(RgbColor.white)
+    open var material: Material =
+        StaticColorMaterial(RgbColor.white)
 
     abstract fun hit(ray: Ray): HitResult
 

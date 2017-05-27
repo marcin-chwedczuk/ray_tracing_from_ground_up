@@ -26,8 +26,22 @@ abstract class BaseCamera {
 
     var exposureTime: Double = 1.0
 
-    // camera rotation around eye-lookAt axis
+    // camera tilt
     var rollAngleInDegrees: Double = 0.0
+        set(value) {
+            field = value
+            computeUvw()
+        }
+
+    // useful to look at the sky or at the ground
+    var pitchAngleInDegrees: Double = 0.0
+        set(value) {
+            field = value
+            computeUvw()
+        }
+
+    // look at the left or at the right
+    var yawAngleInDegrees: Double = 0.0
         set(value) {
             field = value
             computeUvw()
@@ -49,17 +63,18 @@ abstract class BaseCamera {
     val cameraUp: Vector3D
         get() = v
 
+    val cameraLookAt: Vector3D
+        get() = -w
+
+    fun setViewDirection(vec: Vector3D) {
+        val newLookAt = eye + vec.norm()
+        lookAt = newLookAt
+        computeUvw()
+    }
+
     protected fun computeUvw() {
         w = (eye - lookAt).norm()
-
         u = (up cross w).norm()
-        // if roll angle is set, rotate u around w axis
-        if (Math.abs(rollAngleInDegrees) > K_EPSILON) {
-            val rollRotationMatrix =
-                    Matrix4.rotationMatrix(w, rollAngleInDegrees)
-            u = (rollRotationMatrix*u).norm()
-        }
-
         v = (w cross u).norm()
 
         // take care of the singularity by hardwiring in specific camera orientations
@@ -77,5 +92,27 @@ abstract class BaseCamera {
             v = Vector3D(0, 0, 1)
             w = Vector3D(0, -1, 0)
         }
+
+        // rotate camera - order of operations is important
+        var rotationMatrix = Matrix4.identity
+
+        if (Math.abs(rollAngleInDegrees) > K_EPSILON) {
+            rotationMatrix *=
+                    Matrix4.rotationMatrix(w, rollAngleInDegrees)
+        }
+
+        if (Math.abs(yawAngleInDegrees) > K_EPSILON) {
+            rotationMatrix *=
+                    Matrix4.rotationMatrix(v, yawAngleInDegrees)
+        }
+
+        if (Math.abs(pitchAngleInDegrees) > K_EPSILON) {
+            rotationMatrix *=
+                    Matrix4.rotationMatrix(u, pitchAngleInDegrees)
+        }
+
+        w = (rotationMatrix*w).norm()
+        u = (rotationMatrix*u).norm()
+        v = (rotationMatrix*v).norm()
     }
 }

@@ -1,9 +1,12 @@
-package mc.raytracer.geometry
+package mc.raytracer.util
 
 import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
+import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import java.lang.Math.max
+import java.lang.Math.min
 
-class Box(
+class BoundingBox(
         val xMin: Double, val xMax: Double,
         val yMin: Double, val yMax: Double,
         val zMin: Double, val zMax: Double
@@ -14,9 +17,7 @@ class Box(
         if (zMin > zMax) throw IllegalArgumentException("zMin cannot be greater than zMax")
     }
 
-    fun hit(ray: Ray): Boolean {
-        // TODO: Check this code
-
+    fun isIntersecting(ray: Ray): Boolean {
         val ox = ray.origin.x;    val oy = ray.origin.y; 	val oz = ray.origin.z
 	    val dx = ray.direction.x; val dy = ray.direction.y; val dz = ray.direction.z
 
@@ -53,27 +54,18 @@ class Box(
             tz_max = (zMin - oz) * c
         }
 
-        var t0 = 0.0; var t1 = 0.0
-
         // find largest entering t value
-        if (tx_min > ty_min)
-            t0 = tx_min
-        else
-            t0 = ty_min
-
-        if (tz_min > t0)
-            t0 = tz_min
+        var t0 = max(tx_min, max(ty_min, tz_min))
 
         // find smallest exiting t value
-        if (tx_max < ty_max)
-            t1 = tx_max
-        else
-            t1 = ty_max
-
-        if (tz_max < t1)
-            t1 = tz_max
+        var t1 = min(tx_max, min(ty_max, tz_max))
 
         return (t0 < t1 && t1 > K_EPSILON)
     }
 
+    fun isInside(point: Point3D): Boolean {
+        return (point.x in xMin..xMax) &&
+               (point.y in yMin..yMax) &&
+               (point.z in zMin..zMax)
+    }
 }

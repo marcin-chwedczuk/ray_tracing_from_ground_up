@@ -6,7 +6,7 @@ class Normal3D(val x: Double, val y:Double, val z:Double) {
     constructor(x: Int, y: Int, z: Int)
         : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    constructor(vec: Vector3D)
+    private constructor(vec: Vector3D)
         : this(vec.x, vec.y, vec.z)
 
     val length: Double
@@ -42,6 +42,13 @@ class Normal3D(val x: Double, val y:Double, val z:Double) {
 
     operator fun times(scalar: Double)
         = Normal3D(x*scalar, y*scalar, z*scalar)
+
+    // companion object --------------------------------------
+
+    companion object {
+        fun fromVector(vec: Vector3D)
+            = Normal3D(vec.norm())
+    }
 }
 
 operator fun Double.times(vec: Normal3D)

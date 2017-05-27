@@ -33,7 +33,7 @@ class Sphere(
         if (t > K_EPSILON) {
             return Hit(t, ShadingInfo(
                 objectHit = true,
-                normalAtHitPoint = Normal3D((temp + ray.direction*t)/radius),
+                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius),
                 localHitPoint = ray.origin+ray.direction*t,
                 material = material))
         }
@@ -43,7 +43,7 @@ class Sphere(
         if (t > K_EPSILON) {
             return Hit(t, ShadingInfo(
                 objectHit = true,
-                normalAtHitPoint = Normal3D((temp + ray.direction*t)/radius),
+                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius),
                 localHitPoint = ray.origin+ray.direction*t,
                 material = material))
         }

@@ -1,28 +1,22 @@
 package mc.raytracer
 
 import mc.raytracer.cameras.PinholeCamera
+import mc.raytracer.geometry.Cube
 import mc.raytracer.geometry.Plane
-import mc.raytracer.geometry.SinX2Y2Function
+import mc.raytracer.geometry.Rectangle2D
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.gui.MainWindow
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.StaticColorMaterial
 import mc.raytracer.math.*
-import mc.raytracer.sampling.CircleSampler
-import mc.raytracer.sampling.HammersleySampler
-import mc.raytracer.sampling.HemisphereSampler
-import mc.raytracer.sampling.NRooksSampler
 import mc.raytracer.tracers.SingleSphereTracer
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.ViewPlane
 import mc.raytracer.world.World
-import org.omg.PortableServer.POA
 import java.awt.event.KeyEvent
 import java.awt.event.WindowEvent
-import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.swing.SwingUtilities
 import java.awt.event.WindowEvent.WINDOW_CLOSING
 
@@ -67,13 +61,17 @@ fun main(args: Array<String>) {
         world.addObject(sphere)
     }
 
-    val zero = Sphere(Point3D(0,0,0), 100.0)
+    val zero = Sphere(Point3D(800,0,0), 100.0)
     zero.material = StaticColorMaterial(RgbColor.yellow)
     world.addObject(zero)
 
     val floor = Plane(Point3D(0,-300,0), Normal3D(0,1,0))
     floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize=100.0)
     world.addObject(floor)
+
+    val box = Cube(Point3D(0,150,-300), 100.0)
+    box.material = StaticColorMaterial(RgbColor.red)
+    world.addObject(box)
 
     /*val tmp = pixelSize*Math.min(bitmap.width, bitmap.heigh) / 2
     val `fun` = SinX2Y2Function(Point2D(-tmp,tmp), Point2D(tmp,-tmp))
@@ -100,7 +98,7 @@ fun main(args: Array<String>) {
                 else {
                     val step = 37.0
                     when (keyCode) {
-                        KeyEvent.VK_Q -> {
+                        KeyEvent.VK_ESCAPE, KeyEvent.VK_Q -> {
                             SwingUtilities.invokeAndWait {
                                 mainWindow.dispatchEvent(WindowEvent(mainWindow, WINDOW_CLOSING))
                             }
@@ -108,25 +106,29 @@ fun main(args: Array<String>) {
                         }
 
                         KeyEvent.VK_RIGHT -> {
-                            val lookAtVec = camera.lookAt - camera.eye
-                            val rotatedLookAtVec = rotateRight*lookAtVec
-                            camera.lookAt = camera.eye + rotatedLookAtVec
+                            camera.yawAngleInDegrees -= 5.0
                         }
 
                         KeyEvent.VK_LEFT -> {
-                            val lookAtVec = camera.lookAt - camera.eye
-                            val rotatedLookAtVec = rotateLeft*lookAtVec
-                            camera.lookAt = camera.eye + rotatedLookAtVec
+                            camera.yawAngleInDegrees += 5.0
                         }
 
                         KeyEvent.VK_UP -> {
-                            val lookAtVec = (camera.lookAt - camera.eye).norm() * step
+                            camera.pitchAngleInDegrees += 5.0
+                        }
+
+                        KeyEvent.VK_DOWN -> {
+                            camera.pitchAngleInDegrees -= 5.0
+                        }
+
+                        KeyEvent.VK_W -> {
+                            val lookAtVec = camera.cameraLookAt * step
                             camera.lookAt = camera.lookAt + lookAtVec
                             camera.eye = camera.eye + lookAtVec
                         }
 
-                        KeyEvent.VK_DOWN -> {
-                            val lookAtVec = (camera.lookAt - camera.eye).norm() * step
+                        KeyEvent.VK_S -> {
+                            val lookAtVec = camera.cameraLookAt * step
                             camera.lookAt = camera.lookAt - lookAtVec
                             camera.eye = camera.eye - lookAtVec
                         }
@@ -144,9 +146,11 @@ fun main(args: Array<String>) {
                         }
 
                         KeyEvent.VK_R -> {
+                            //camera.fieldOfViewInDegrees += 10.0
                             camera.rollAngleInDegrees += 5.0
                         }
                         KeyEvent.VK_T -> {
+                            //camera.fieldOfViewInDegrees -= 10.0
                             camera.rollAngleInDegrees -= 5.0
                         }
                     }
