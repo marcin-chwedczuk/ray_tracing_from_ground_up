@@ -12,7 +12,7 @@ class ThinLensCamera(
         val lensSampler: CircleSampler)
     : BaseCamera(canvas) {
 
-    var lensRadius: Double = 1.0
+    var lensRadius: Double = 14.0
     var viewPlaneDistance: Double = 500.0
 
     // focal plane is the plane on which camera focus
