@@ -1,24 +1,22 @@
 package mc.raytracer.cameras
 
-import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
-import mc.raytracer.math.Ray
-import mc.raytracer.math.*
+import mc.raytracer.math.Point2D
+import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.util.RawBitmap
+import mc.raytracer.math.*
 import mc.raytracer.util.RgbColor
-import mc.raytracer.world.ViewPlane
 import mc.raytracer.world.World
 
-class PinholeCamera(canvas: RawBitmap): BaseCamera(canvas) {
+class ThinLensCamera(
+        canvas: RawBitmap,
+        val lensSampler: CircleSampler)
+    : BaseCamera(canvas) {
 
+    var lensRadius: Double = 1.0
     var viewPlaneDistance: Double = 500.0
-    var fieldOfViewInDegrees: Double = 0.0
-        set(value) {
-            if (value <= 0.0 || value >= 180.0)
-                throw IllegalArgumentException("field of view must be withing 0-180 degrees range.")
 
-            field = value
-        }
-
+    // focal plane is the plane on which camera focus
+    var focalPlaneDistance: Double = 800.0
     var zoom: Double = 1.0
 
     fun render(world: World) {
@@ -28,8 +26,6 @@ class PinholeCamera(canvas: RawBitmap): BaseCamera(canvas) {
 
         val hres = viewPlane.horizontalResolution
         val vres = viewPlane.verticalResolution
-
-        val dist = getViewPlaneDistance(vres)
 
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
@@ -44,8 +40,11 @@ class PinholeCamera(canvas: RawBitmap): BaseCamera(canvas) {
                     val x = pixelSize * (c - hres / 2.0 + p.x)
                     val y = pixelSize * (vres / 2.0 - r + p.y)
 
-                    val direction = x*u + y*v - dist*w
-                    val ray = Ray(eye, direction)
+                    val lensPoint = lensRadius*lensSampler.nextSampleOnUnitDisk()
+
+                    val rayOrigin = eye + lensPoint.x*u + lensPoint.y*v
+                    val rayDirection = rayDirection(Point2D(x,y), lensPoint)
+                    val ray = Ray(rayOrigin, rayDirection)
 
                     L += tracer.traceRay(ray)
                 }
@@ -57,11 +56,16 @@ class PinholeCamera(canvas: RawBitmap): BaseCamera(canvas) {
         }
     }
 
-    private fun getViewPlaneDistance(verticalResolution: Int): Double {
-        if (fieldOfViewInDegrees < K_EPSILON)
-            return viewPlaneDistance
+    private fun rayDirection(viewPlanePoint: Point2D, lensPoint: Point2D): Vector3D {
+        // compute focal point corresponding to lens point
+        val x = viewPlanePoint.x * focalPlaneDistance/viewPlaneDistance
+        val y = viewPlanePoint.y * focalPlaneDistance/viewPlaneDistance
 
-        val dist = verticalResolution / Math.tan(fieldOfViewInDegrees.degToRad()/2.0)
-        return dist
+        // compute ((x,y) - lensPoint) vector
+        val direction = (x - lensPoint.x)*u +
+                (y - lensPoint.y)*v +
+                -focalPlaneDistance*w
+
+        return direction.norm()
     }
 }

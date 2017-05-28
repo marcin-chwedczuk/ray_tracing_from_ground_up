@@ -1,14 +1,16 @@
 package mc.raytracer
 
 import mc.raytracer.cameras.PinholeCamera
-import mc.raytracer.geometry.Cube
+import mc.raytracer.cameras.ThinLensCamera
+import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
-import mc.raytracer.geometry.Rectangle2D
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.gui.MainWindow
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.StaticColorMaterial
 import mc.raytracer.math.*
+import mc.raytracer.sampling.CircleSampler
+import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.tracers.SingleSphereTracer
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
@@ -19,8 +21,6 @@ import java.awt.event.WindowEvent
 import java.util.*
 import javax.swing.SwingUtilities
 import java.awt.event.WindowEvent.WINDOW_CLOSING
-
-
 
 fun main(args: Array<String>) {
     val scale = 2
@@ -43,35 +43,53 @@ fun main(args: Array<String>) {
     viewPlane.setNumberOfSamples(4)
 
     val tracer = SingleSphereTracer()
-    val camera = PinholeCamera(bitmap)
-    camera.viewPlaneDistance = 400.0
 
+    val lensSampler = CircleSampler.fromSquareSampler(
+            MultiJitteredSampler(viewPlane.numerOfSamplesPerPixel))
+    val camera = ThinLensCamera(bitmap, lensSampler)
+
+    camera.viewPlaneDistance = 200.0
+    camera.focalPlaneDistance = 450.0
+    camera.lensRadius = 14.0
+    // camera.eye = Point3D(0,0,-280)
 
     val world = World(viewPlane, RgbColor.black, tracer, camera)
 
     val rnd = Random()
     rnd.setSeed(123456)
 
-    for (i in 1..40) {
+    for (i in 1..80) {
         val sphere = Sphere(
-                Point3D(-300+rnd.nextInt(700), -300+rnd.nextInt(700), -500+rnd.nextInt(300)),
-                rnd.nextDouble()*130)
+                Point3D(-300+rnd.nextInt(700), -300+rnd.nextInt(700), -500+rnd.nextInt(800)),
+                rnd.nextDouble()*60)
 
         sphere.material = StaticColorMaterial(RgbColor(rnd.nextDouble(), rnd.nextDouble(), rnd.nextDouble()))
         world.addObject(sphere)
     }
 
-    val zero = Sphere(Point3D(800,0,0), 100.0)
-    zero.material = StaticColorMaterial(RgbColor.yellow)
-    world.addObject(zero)
+    val sunny = Sphere(Point3D(0,800,0), 100.0)
+    sunny.material = StaticColorMaterial(RgbColor.white)
+    world.addObject(sunny)
 
-    val floor = Plane(Point3D(0,-300,0), Normal3D(0,1,0))
+   /* for(i in 1..16) {
+        val box = Cuboid(Point3D(0,0,-300+i*40), length = 20.0, depth = 20.0, height = 100.0)
+        box.material = ChessboardMaterial(RgbColor.black, RgbColor.randomColor(), patternSize=5.0)
+        world.addObject(box)
+    }
+
+    for(i in 1..16) {
+        val box = Cuboid(Point3D(30+i*40,0,-300), length = 20.0, depth = 20.0, height = 100.0)
+        box.material = ChessboardMaterial(RgbColor.black, RgbColor.randomColor(), patternSize=5.0)
+        world.addObject(box)
+    } */
+
+    val floor = Plane(Point3D(0.0,-300.01,0.0), Normal3D(0,1,0))
     floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize=100.0)
     world.addObject(floor)
 
-    val box = Cube(Point3D(0,150,-300), 100.0)
-    box.material = StaticColorMaterial(RgbColor.red)
-    world.addObject(box)
+    //val box = Cuboid(Point3D(0,250,-300), 150.0)
+    //box.material = ChessboardMaterial(RgbColor.black, RgbColor.red, patternSize=15.0)
+    //world.addObject(box)
 
     /*val tmp = pixelSize*Math.min(bitmap.width, bitmap.heigh) / 2
     val `fun` = SinX2Y2Function(Point2D(-tmp,tmp), Point2D(tmp,-tmp))

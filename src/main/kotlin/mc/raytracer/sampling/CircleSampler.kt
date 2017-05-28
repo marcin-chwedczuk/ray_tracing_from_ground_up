@@ -13,7 +13,7 @@ class CircleSampler private constructor(
     var circleSamples: ArrayList<Point2D> =
             mapSamplesToUnitDisk(squareSampler.getSquareSamples())
 
-    fun nextSample()
+    fun nextSampleOnUnitDisk()
         = circleSamples[nextShuffledIndex()]
 
     private fun mapSamplesToUnitDisk(squareSamples: List<Point2D>): ArrayList<Point2D> {

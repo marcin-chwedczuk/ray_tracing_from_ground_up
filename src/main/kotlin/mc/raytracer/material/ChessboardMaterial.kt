@@ -15,13 +15,18 @@ class ChessboardMaterial(
         val x = if (info.localHitPoint.x > 0) info.localHitPoint.x
                 else patternSize - info.localHitPoint.x
 
+        val y = if(info.localHitPoint.y > 0) info.localHitPoint.y
+                else patternSize - info.localHitPoint.y
+
         val z = if (info.localHitPoint.z > 0) info.localHitPoint.z
                 else patternSize - info.localHitPoint.z
 
         val xn = (x / patternSize).toInt()
+        val yn = (y / patternSize).toInt()
         val zn = (z / patternSize).toInt()
 
-        if ((xn % 2) == (zn % 2))
+        val total = (xn%2) + (yn%2) + (zn%2)
+        if ((total % 2) == 0)
             return color1
 
         return color2

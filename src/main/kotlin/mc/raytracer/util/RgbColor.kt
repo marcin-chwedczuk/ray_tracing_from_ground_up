@@ -63,6 +63,20 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
             val clamped = value.clamp(0.0, 1.0)
             return RgbColor(clamped, clamped, clamped)
         }
+
+        fun randomColor()
+            = RgbColor(
+                GlobalRandom.nextDouble(),
+                GlobalRandom.nextDouble(),
+                GlobalRandom.nextDouble())
+
+        fun fromArgb(color: Long): RgbColor {
+            val r = ((0xFF0000L and color) shr 16) / 255.0
+            val g = ((0x00FF00L and color) shr  8) / 255.0
+            val b = ((0x0000FFL and color) shr  0) / 255.0
+
+            return RgbColor(r,g,b)
+        }
     }
 }
 

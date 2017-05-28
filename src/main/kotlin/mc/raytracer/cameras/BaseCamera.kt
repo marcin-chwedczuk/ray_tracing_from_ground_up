@@ -4,8 +4,12 @@ import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
 import mc.raytracer.math.Matrix4
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Vector3D
+import mc.raytracer.util.RawBitmap
+import mc.raytracer.util.RgbColor
+import mc.raytracer.world.ViewPlane
 
-abstract class BaseCamera {
+abstract class BaseCamera(val canvas: RawBitmap) {
+
     var eye: Point3D = Point3D(0,0,500)
         set(newValue) {
             field = newValue
@@ -114,5 +118,19 @@ abstract class BaseCamera {
         w = (rotationMatrix*w).norm()
         u = (rotationMatrix*u).norm()
         v = (rotationMatrix*v).norm()
+    }
+
+    protected fun displayPixel(viewPlane: ViewPlane, vpRow: Int, vpCol: Int, color: RgbColor) {
+        var colorToDisplay =
+                if (viewPlane.showOutOfGamutErrors)
+                    color.orWhenOutOfRange(RgbColor.red)
+                else
+                    color.scaleMaxToOne()
+
+        if (viewPlane.gamma != 1.0)
+            colorToDisplay = colorToDisplay.powComponents(viewPlane.gammaInv)
+
+        val argb = colorToDisplay.toInt()
+        canvas.setPixel(vpRow, vpCol, argb)
     }
 }
