@@ -17,12 +17,13 @@ import javax.swing.SwingUtilities
 class MainWindow(val rayTracingThread: RayTracingThread)
     : JFrame() {
 
-    private var currentResolution = 1
+    private var currentResolution = 4
     private var supportedResolutions = arrayOf(
             Resolution(100,80),
             Resolution(200,160),
             Resolution(400,320),
-            Resolution(800,640))
+            Resolution(800,640),
+            Resolution(810, 640) /* for stereo viewing */)
 
     private var currentSampleNumber = 2
 
@@ -33,8 +34,8 @@ class MainWindow(val rayTracingThread: RayTracingThread)
     private lateinit var panel: JPanel
 
     init {
-        changeToCurrentResolution()
         initUI()
+        changeToCurrentResolution()
     }
 
     private fun changeToCurrentResolution() {
@@ -52,6 +53,15 @@ class MainWindow(val rayTracingThread: RayTracingThread)
         bitmap.clear(RgbColor.black.toArgb())
 
         rayTracingThread.changeBitmap(bitmap)
+
+        if (newResolution.horizontal >= 800 && newResolution.vertical >= 640) {
+            setSize(newResolution.horizontal, newResolution.vertical)
+            panel.setSize(newResolution.horizontal, newResolution.vertical)
+        }
+        else {
+            setSize(800, 640)
+            panel.setSize(800, 640)
+        }
     }
 
     private fun updateBufferedImage() {

@@ -59,6 +59,46 @@ class PinholeCamera : BaseCamera() {
         }
     }
 
+    override fun renderStereo(world: World, canvas: RawBitmap, cancelFlag: CancelFlag,
+                              viewPortOffsetX: Double, viewPortOffsetY: Double,
+                              canvasOffsetX: Int, canvasOffsetY: Int) {
+        val viewPlane = world.viewPlane
+        val tracer = world.tracer
+        val pixelSize = viewPlane.pixelSize / zoom
+
+        val hres = viewPlane.horizontalResolution
+        val vres = viewPlane.verticalResolution
+
+        val dist = getViewPlaneDistance(vres)
+
+        //IntStream.range(0, vres).parallel()
+        //        .forEach { r ->
+        for (r in 0 until vres) {
+            if (cancelFlag.shouldCancel) return
+
+            for (c in 0 until hres) {
+
+                var L = RgbColor.black
+
+                for (sample in 1..viewPlane.numberOfSamplesPerPixel) {
+                    val p = viewPlane.sampler.nextSampleOnUnitSquare()
+
+                    val x = pixelSize * (c - hres / 2.0 + p.x) + viewPortOffsetX
+                    val y = pixelSize * (vres / 2.0 - r + p.y) + viewPortOffsetY
+
+                    val direction = x * u + y * v - dist * w
+                    val ray = Ray(eye, direction)
+
+                    L += tracer.traceRay(ray)
+                }
+                L /= viewPlane.numberOfSamplesPerPixel.toDouble()
+                L *= exposureTime
+
+                viewPlane.displayPixel(canvas, r+canvasOffsetY, c+canvasOffsetX, L)
+            }
+        }
+    }
+
     private fun getViewPlaneDistance(verticalResolution: Int): Double {
         if (fieldOfViewInDegrees < K_EPSILON)
             return viewPlaneDistance

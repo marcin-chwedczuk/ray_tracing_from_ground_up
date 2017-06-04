@@ -75,7 +75,7 @@ abstract class BaseCamera {
         computeUvw()
     }
 
-    protected fun computeUvw() {
+    private fun computeUvw() {
         w = (eye - lookAt).norm()
         u = (up cross w).norm()
         v = (w cross u).norm()
@@ -117,10 +117,21 @@ abstract class BaseCamera {
         w = (rotationMatrix*w).norm()
         u = (rotationMatrix*u).norm()
         v = (rotationMatrix*v).norm()
+
+        afterUvwComputed()
     }
+
+    protected open fun afterUvwComputed() { }
 
     abstract fun render(
             world: World, canvas: RawBitmap, cancelFlag: CancelFlag)
+
+    open fun renderStereo(
+            world: World, canvas: RawBitmap, cancelFlag: CancelFlag,
+            viewPortOffsetX: Double, viewPortOffsetY: Double,
+            canvasOffsetX: Int, canvasOffsetY: Int) {
+        throw NotImplementedError("This camera doesn't support rendering stereo.")
+    }
 
     fun moveForward(distance: Double) {
         val lookAtVec = cameraLookAt * distance
@@ -142,4 +153,13 @@ abstract class BaseCamera {
     fun moveLeft(distance: Double) {
         moveRight(-distance)
     }
+
+    open fun minNeededHorizontalPixels(world: World): Int {
+        return world.viewPlane.horizontalResolution
+    }
+
+    open fun minNeededVerticalPixels(world: World): Int {
+        return world.viewPlane.verticalResolution
+    }
+
 }

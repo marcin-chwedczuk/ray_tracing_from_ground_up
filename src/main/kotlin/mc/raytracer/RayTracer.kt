@@ -2,6 +2,7 @@ package mc.raytracer
 
 import mc.raytracer.cameras.BaseCamera
 import mc.raytracer.cameras.PinholeCamera
+import mc.raytracer.cameras.StereoCamera
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
 import mc.raytracer.geometry.Sphere
@@ -30,21 +31,28 @@ class RayTracer {
         private set
 
     init {
-        viewPlane = ViewPlane(800, 640, pixelSize=1.0)
+        viewPlane = ViewPlane(400, 320, pixelSize=2.0)
         viewPlane.configureNumberOfSamplesPerPixel(4)
 
         val tracer = SimpleMultipleObjectsTracer()
 
-        camera = PinholeCamera()
+        val pinholeCamera = PinholeCamera()
+        camera = StereoCamera(pinholeCamera, pinholeCamera).apply {
+            pixelGap = 8
+        }
+
         world = World(viewPlane, RgbColor.grayscale(0.2), tracer)
     }
 
     fun render(canvas: RawBitmap, cancelFlag: CancelFlag) {
-        if (canvas.width < viewPlane.horizontalResolution ||
-            canvas.heigh < viewPlane.verticalResolution)
+        val minH = camera.minNeededHorizontalPixels(world)
+        val minV = camera.minNeededVerticalPixels(world)
+
+        if (canvas.width < minH || canvas.heigh < minV)
                 throw IllegalArgumentException(
-                        "Provided canvas is too small for rendering of current view plane. " +
-                        "Provide canvas with at lest ${viewPlane.horizontalResolution}x${viewPlane.verticalResolution} resolution.")
+                        "Provided canvas (${canvas.width}x${canvas.heigh}) is too "+
+                        "small for rendering of current view plane. " +
+                        "Provide canvas with at least ${minH}x${minV} resolution.")
 
         camera.render(world, canvas, cancelFlag)
     }
