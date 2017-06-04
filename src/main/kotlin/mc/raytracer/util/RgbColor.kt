@@ -31,7 +31,7 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         return if (max > 1.0f) color else this
     }
 
-    fun toInt(): Int {
+    fun toArgb(): Int {
         val rr = (r*255).toInt() shl 16
         val gg = (g*255).toInt() shl 8
         val bb = (b*255).toInt()

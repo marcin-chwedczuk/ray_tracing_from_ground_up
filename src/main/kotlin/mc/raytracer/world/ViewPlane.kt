@@ -3,37 +3,73 @@ package mc.raytracer.world
 import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.sampling.RegularSampler
 import mc.raytracer.sampling.SquareSampler
+import mc.raytracer.util.RawBitmap
+import mc.raytracer.util.RgbColor
 
 class ViewPlane(
-        val horizontalResolution: Int,
-        val verticalResolution: Int,
+        horizontalResolution: Int,
+        verticalResolution: Int,
         var pixelSize: Double = 1.0,
         var gamma: Double = 1.0,
         var showOutOfGamutErrors: Boolean = false
 ) {
     lateinit var sampler: SquareSampler
+
+    var horizontalResolution: Int = horizontalResolution
         private set
 
-    val numerOfSamplesPerPixel: Int
+    var verticalResolution: Int = verticalResolution
+        private set
+
+    val numberOfSamplesPerPixel: Int
             get() { return sampler.numberOfSamples }
 
-    val gammaInv
-        get() = 1.0/gamma
-
     init {
-        setNumberOfSamples(1)
+        configureNumberOfSamplesPerPixel(1)
     }
 
-    fun useSampler(sampler: SquareSampler) {
-        this.sampler = sampler
-    }
-
-    fun setNumberOfSamples(num: Int) {
+    fun configureNumberOfSamplesPerPixel(num: Int) {
         if (num > 0) {
             sampler = MultiJitteredSampler(num)
         }
         else {
             sampler = RegularSampler(1)
         }
+    }
+
+    fun changeResolutionPreservingViewPlaneWidth(newHorizontalResolution: Int,
+                                                 newVerticalResolution: Int) {
+        if (newHorizontalResolution < 1)
+            throw IllegalArgumentException("newHorizontalResolution cannot be less than 1.")
+
+        if (newVerticalResolution < 1)
+            throw IllegalArgumentException("newVerticalResolution cannot be less than 1.")
+
+        val oldWidth = pixelSize*horizontalResolution
+
+        horizontalResolution = newHorizontalResolution
+        verticalResolution = newVerticalResolution
+
+        pixelSize = oldWidth / newHorizontalResolution
+    }
+
+    fun setViewPlaneWidth(newWidth: Double) {
+        if (newWidth <= 0)
+            throw IllegalArgumentException("newWidth cannot be less then zero.")
+
+        this.pixelSize = newWidth / horizontalResolution
+    }
+
+    fun displayPixel(canvas: RawBitmap, vpRow: Int, vpCol: Int, color: RgbColor) {
+        var colorToDisplay =
+                if (showOutOfGamutErrors)
+                    color.orWhenOutOfRange(RgbColor.red)
+                else
+                    color.scaleMaxToOne()
+
+        if (gamma != 1.0)
+            colorToDisplay = colorToDisplay.powComponents(1.0/gamma)
+
+        canvas.setPixel(vpRow, vpCol, colorToDisplay)
     }
 }

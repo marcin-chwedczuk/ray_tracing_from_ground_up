@@ -33,7 +33,7 @@ class Rectangle2D(
         val t = ((p0 - ray.origin) dot normal) / (ray.direction dot normal)
 
         if (t <= K_EPSILON)
-        return Miss.instance
+            return Miss.instance
 
         val p = ray.origin + t*ray.direction
         val d = p - p0

@@ -18,7 +18,7 @@ abstract class SquareSampler(numberOfSamples: Int = BaseSampler.DEFAULT_NUMBER_O
     internal fun getSquareSamples(): List<Point2D> =
         Collections.unmodifiableList(squareSamples)
 
-    fun nextSample()
+    fun nextSampleOnUnitSquare()
         = squareSamples[nextShuffledIndex()]
 
     protected fun shuffleXCoordinates() {

@@ -20,8 +20,7 @@ import java.util.stream.StreamSupport
 class World(
         val viewPlane: ViewPlane,
         val backgroundColor: RgbColor,
-        val tracer: Tracer,
-        val camera: BaseCamera
+        val tracer: Tracer
 ) {
     init {
         tracer.init(this)

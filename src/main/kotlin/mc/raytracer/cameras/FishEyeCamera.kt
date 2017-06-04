@@ -2,23 +2,22 @@ package mc.raytracer.cameras
 
 import mc.raytracer.math.*
 import mc.raytracer.math.degToRad
+import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.World
 
-class FishEyeCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
+class FishEyeCamera: BaseCamera() {
     private var maxPsi = 90.0
 
     var fieldOfViewInDegrees: Double
         get() = maxPsi*2.0
         set(v) { maxPsi = v/2.0 }
 
-    var zoom: Double = 1.0
-
-    fun render(world: World) {
+    override fun render(world: World, canvas: RawBitmap, cancelFlag: CancelFlag) {
         val viewPlane = world.viewPlane
         val tracer = world.tracer
-        val pixelSize = viewPlane.pixelSize / zoom
+        val pixelSize = viewPlane.pixelSize
 
         val hres = viewPlane.horizontalResolution
         val vres = viewPlane.verticalResolution
@@ -26,12 +25,14 @@ class FishEyeCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
         for (r in 0 until vres) {
+            if (cancelFlag.shouldCancel) return
+
             for (c in 0 until hres) {
 
                 var L = RgbColor.black
 
-                for (sample in 1..viewPlane.numerOfSamplesPerPixel) {
-                    val p = viewPlane.sampler.nextSample()
+                for (sample in 1..viewPlane.numberOfSamplesPerPixel) {
+                    val p = viewPlane.sampler.nextSampleOnUnitSquare()
 
                     val x = pixelSize * (c - hres / 2.0 + p.x)
                     val y = pixelSize * (vres / 2.0 - r + p.y)
@@ -39,7 +40,7 @@ class FishEyeCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
                     val direction = computeRayDirection(
                             x,y, vres, hres, pixelSize)
 
-                    // point no in "fisheye" view
+                    // point on canvas is not rendered by "fisheye" camera
                     if (direction == null)
                         continue
 
@@ -47,10 +48,10 @@ class FishEyeCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
 
                     L += tracer.traceRay(ray)
                 }
-                L /= viewPlane.numerOfSamplesPerPixel.toDouble()
+                L /= viewPlane.numberOfSamplesPerPixel.toDouble()
                 L *= exposureTime
 
-                displayPixel(viewPlane, r, c, L)
+                viewPlane.displayPixel(canvas, r, c, L)
             }
         }
     }

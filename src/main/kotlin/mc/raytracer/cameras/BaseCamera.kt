@@ -4,11 +4,13 @@ import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
 import mc.raytracer.math.Matrix4
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Vector3D
+import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.ViewPlane
+import mc.raytracer.world.World
 
-abstract class BaseCamera(val canvas: RawBitmap) {
+abstract class BaseCamera {
 
     var eye: Point3D = Point3D(0,0,500)
         set(newValue) {
@@ -54,19 +56,16 @@ abstract class BaseCamera(val canvas: RawBitmap) {
     // orthonormal camera coordinate base (enter at eye point)
     // camera right vector
     protected var u = Vector3D(1,0,0)
-
-    // camera up vector
-    protected var v = Vector3D(0,1,0)
-
-    // look at unit vector (from lookAt point to eye)
-    protected var w = Vector3D(0,0,1)
-
     val cameraRight: Vector3D
         get() = u
 
+    // camera up vector
+    protected var v = Vector3D(0,1,0)
     val cameraUp: Vector3D
         get() = v
 
+    // look at unit vector (from lookAt point to eye)
+    protected var w = Vector3D(0,0,1)
     val cameraLookAt: Vector3D
         get() = -w
 
@@ -120,17 +119,27 @@ abstract class BaseCamera(val canvas: RawBitmap) {
         v = (rotationMatrix*v).norm()
     }
 
-    protected fun displayPixel(viewPlane: ViewPlane, vpRow: Int, vpCol: Int, color: RgbColor) {
-        var colorToDisplay =
-                if (viewPlane.showOutOfGamutErrors)
-                    color.orWhenOutOfRange(RgbColor.red)
-                else
-                    color.scaleMaxToOne()
+    abstract fun render(
+            world: World, canvas: RawBitmap, cancelFlag: CancelFlag)
 
-        if (viewPlane.gamma != 1.0)
-            colorToDisplay = colorToDisplay.powComponents(viewPlane.gammaInv)
+    fun moveForward(distance: Double) {
+        val lookAtVec = cameraLookAt * distance
 
-        val argb = colorToDisplay.toInt()
-        canvas.setPixel(vpRow, vpCol, argb)
+        lookAt += lookAtVec
+        eye += lookAtVec
+    }
+
+    fun moveBackwards(distance: Double) {
+        moveForward(-distance)
+    }
+
+    fun moveRight(distance: Double) {
+        val delta = cameraRight*distance
+        eye += delta
+        lookAt += delta
+    }
+
+    fun moveLeft(distance: Double) {
+        moveRight(-distance)
     }
 }

@@ -8,7 +8,7 @@ import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 import mc.raytracer.world.World
 
-class SingleSphereTracer: Tracer {
+class SimpleMultipleObjectsTracer : Tracer {
     lateinit var world: World
 
     override fun init(world: World) {

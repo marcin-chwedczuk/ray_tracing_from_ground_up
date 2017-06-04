@@ -1,16 +1,17 @@
 package mc.raytracer.cameras
 
 import mc.raytracer.math.Point2D
+import mc.raytracer.math.Ray
+import mc.raytracer.math.Vector3D
+import mc.raytracer.math.times
 import mc.raytracer.sampling.CircleSampler
+import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
-import mc.raytracer.math.*
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.World
 
-class ThinLensCamera(
-        canvas: RawBitmap,
-        val lensSampler: CircleSampler)
-    : BaseCamera(canvas) {
+class ThinLensCamera(val lensSampler: CircleSampler)
+    : BaseCamera() {
 
     var lensRadius: Double = 14.0
     var viewPlaneDistance: Double = 500.0
@@ -19,7 +20,7 @@ class ThinLensCamera(
     var focalPlaneDistance: Double = 800.0
     var zoom: Double = 1.0
 
-    fun render(world: World) {
+    override fun render(world: World, canvas: RawBitmap, cancelFlag: CancelFlag) {
         val viewPlane = world.viewPlane
         val tracer = world.tracer
         val pixelSize = viewPlane.pixelSize / zoom
@@ -30,12 +31,14 @@ class ThinLensCamera(
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
         for (r in 0 until vres) {
+            if (cancelFlag.shouldCancel) return
+
             for (c in 0 until hres) {
 
                 var L = RgbColor.black
 
-                for (sample in 1..viewPlane.numerOfSamplesPerPixel) {
-                    val p = viewPlane.sampler.nextSample()
+                for (sample in 1..viewPlane.numberOfSamplesPerPixel) {
+                    val p = viewPlane.sampler.nextSampleOnUnitSquare()
 
                     val x = pixelSize * (c - hres / 2.0 + p.x)
                     val y = pixelSize * (vres / 2.0 - r + p.y)
@@ -48,10 +51,10 @@ class ThinLensCamera(
 
                     L += tracer.traceRay(ray)
                 }
-                L /= viewPlane.numerOfSamplesPerPixel.toDouble()
+                L /= viewPlane.numberOfSamplesPerPixel.toDouble()
                 L *= exposureTime
 
-                displayPixel(viewPlane, r,c,L)
+                viewPlane.displayPixel(canvas, r,c,L)
             }
         }
     }

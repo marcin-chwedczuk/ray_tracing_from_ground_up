@@ -13,7 +13,7 @@ class HemisphereSampler private constructor(
     var samples: ArrayList<Point3D> =
             mapSamplesToHemisphere(squareSampler.getSquareSamples())
 
-    fun nextSample()
+    fun nextSampleOnUnitHemisphere()
             = samples[nextShuffledIndex()]
 
     private fun  mapSamplesToHemisphere(squareSamples: List<Point2D>): ArrayList<Point3D> {

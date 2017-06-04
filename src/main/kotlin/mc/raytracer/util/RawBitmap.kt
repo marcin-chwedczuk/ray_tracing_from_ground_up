@@ -23,17 +23,18 @@ class RawBitmap(val width: Int, val heigh: Int) {
         pixels = IntArray(width*heigh)
     }
 
-    fun setPixel(row: Int, col:Int, argb: Int) {
+    fun setPixel(row: Int, col:Int, color: RgbColor) {
         if (row < 0 || row >= heigh)
             throw IndexOutOfBoundsException("row")
 
         if (col < 0 || col >= width)
             throw IndexOutOfBoundsException("col")
 
-        pixels[row*width+col] = argb
+        pixels[row*width+col] = color.toArgb()
     }
 
     fun clear(color: Int) {
         Arrays.fill(pixels, color)
     }
+
 }

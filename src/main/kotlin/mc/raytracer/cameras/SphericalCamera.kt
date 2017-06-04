@@ -2,22 +2,21 @@ package mc.raytracer.cameras
 
 import mc.raytracer.math.*
 import mc.raytracer.math.degToRad
+import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.World
 
-class SphericalCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
+class SphericalCamera: BaseCamera() {
 
     // ration of fov's must be the same as bitmap ration
     var horizontalFieldOfViewInDegrees: Double = 90.0
     var verticalFieldOfViewInDegrees: Double = 90.0
 
-    var zoom: Double = 1.0
-
-    fun render(world: World) {
+    override fun render(world: World, canvas: RawBitmap, cancelFlag: CancelFlag) {
         val viewPlane = world.viewPlane
         val tracer = world.tracer
-        val pixelSize = viewPlane.pixelSize / zoom
+        val pixelSize = viewPlane.pixelSize
 
         val hres = viewPlane.horizontalResolution
         val vres = viewPlane.verticalResolution
@@ -25,12 +24,14 @@ class SphericalCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
         for (r in 0 until vres) {
+            if (cancelFlag.shouldCancel) return
+
             for (c in 0 until hres) {
 
                 var L = RgbColor.black
 
-                for (sample in 1..viewPlane.numerOfSamplesPerPixel) {
-                    val p = viewPlane.sampler.nextSample()
+                for (sample in 1..viewPlane.numberOfSamplesPerPixel) {
+                    val p = viewPlane.sampler.nextSampleOnUnitSquare()
 
                     val x = pixelSize * (c - hres / 2.0 + p.x)
                     val y = pixelSize * (vres / 2.0 - r + p.y)
@@ -41,10 +42,10 @@ class SphericalCamera(bitmap: RawBitmap): BaseCamera(bitmap) {
                     val ray = Ray(eye, direction)
                     L += tracer.traceRay(ray)
                 }
-                L /= viewPlane.numerOfSamplesPerPixel.toDouble()
+                L /= viewPlane.numberOfSamplesPerPixel.toDouble()
                 L *= exposureTime
 
-                displayPixel(viewPlane, r, c, L)
+                viewPlane.displayPixel(canvas, r, c, L)
             }
         }
     }
