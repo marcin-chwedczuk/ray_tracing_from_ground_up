@@ -26,6 +26,8 @@ class Angle {
         = Angle(angleInRadians / x)
 
     companion object {
+        val ZERO = fromDegrees(0)
+
         fun fromDegrees(angleInDegrees: Int)
             = fromDegrees(angleInDegrees.toDouble())
 

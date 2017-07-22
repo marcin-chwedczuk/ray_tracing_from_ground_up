@@ -1,7 +1,12 @@
 package mc.raytracer
 
+import mc.raytracer.cameras.StereoCamera
+import mc.raytracer.cameras.ViewingMode
+import mc.raytracer.math.Angle
 import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
+import mc.raytracer.util.Resolution
+import mc.raytracer.util.StereoResolution
 
 class RayTracingThread(val rayTracer: RayTracer)
     : Thread() {
@@ -17,14 +22,30 @@ class RayTracingThread(val rayTracer: RayTracer)
         isDaemon = true
     }
 
-    fun changeBitmap(bitmap: RawBitmap) {
+    fun changeResolution(bitmap: RawBitmap, viewPlaneResolution: Resolution) {
         cancelRenderingFlag.raise()
 
         synchronized(fieldLock) {
             this.bitmap = bitmap
 
-            this.rayTracer.viewPlane.changeResolutionPreservingViewPlaneWidth(
-                    bitmap.width, bitmap.heigh)
+            rayTracer.viewPlane.changeResolutionPreservingViewPlaneWidth(
+                    viewPlaneResolution.viewPortHorizontal,
+                    viewPlaneResolution.viewPortVertical)
+
+            if (viewPlaneResolution is StereoResolution) {
+                val stereoCamera = rayTracer.enableStereoMode()
+                stereoCamera.pixelGap = viewPlaneResolution.pixelGap
+                stereoCamera.stereoSeparationAngle = Angle.fromDegrees(4.75)
+
+                stereoCamera.forEachEyeCamera {
+                    viewPlaneDistance = 80.0
+                    fieldOfViewInDegrees = 10.0
+                }
+                // stereoCamera.viewingMode = ViewingMode.PARALLEL
+            }
+            else {
+                rayTracer.disableStereoMode()
+            }
         }
     }
 

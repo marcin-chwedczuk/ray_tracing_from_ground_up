@@ -7,6 +7,9 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
     constructor(r: Double, g: Double, b: Double)
         : this(r.toFloat(), g.toFloat(), b.toFloat())
 
+    constructor(r: Short, g: Short, b: Short)
+        : this(r / 255.0, g / 255.0, b / 255.0)
+
     fun multiplyComponentwise(other: RgbColor)
         = RgbColor(r*other.r, g*other.g, b*other.b)
 

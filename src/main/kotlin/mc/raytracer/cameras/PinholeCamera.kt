@@ -29,7 +29,7 @@ class PinholeCamera : BaseCamera() {
         val hres = viewPlane.horizontalResolution
         val vres = viewPlane.verticalResolution
 
-        val dist = getViewPlaneDistance(vres)
+        val dist = getViewPlaneDistance(vres*pixelSize)
 
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
@@ -69,7 +69,7 @@ class PinholeCamera : BaseCamera() {
         val hres = viewPlane.horizontalResolution
         val vres = viewPlane.verticalResolution
 
-        val dist = getViewPlaneDistance(vres)
+        val dist = getViewPlaneDistance(vres*pixelSize)
 
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
@@ -99,11 +99,11 @@ class PinholeCamera : BaseCamera() {
         }
     }
 
-    private fun getViewPlaneDistance(verticalResolution: Int): Double {
+    private fun getViewPlaneDistance(viewPlaneWidth: Double): Double {
         if (fieldOfViewInDegrees < K_EPSILON)
             return viewPlaneDistance
 
-        val dist = verticalResolution / Math.tan(fieldOfViewInDegrees.degToRad() / 2.0)
+        val dist = viewPlaneWidth / Math.tan(fieldOfViewInDegrees.degToRad() / 2.0)
         return dist
     }
 }

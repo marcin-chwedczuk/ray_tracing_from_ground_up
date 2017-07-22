@@ -12,7 +12,7 @@ import mc.raytracer.world.World
 
 abstract class BaseCamera {
 
-    var eye: Point3D = Point3D(0,0,500)
+    var eye: Point3D = Point3D(0,0,20)
         set(newValue) {
             field = newValue
             computeUvw()
@@ -75,7 +75,7 @@ abstract class BaseCamera {
         computeUvw()
     }
 
-    private fun computeUvw() {
+    protected fun computeUvw() {
         w = (eye - lookAt).norm()
         u = (up cross w).norm()
         v = (w cross u).norm()
@@ -128,8 +128,8 @@ abstract class BaseCamera {
 
     open fun renderStereo(
             world: World, canvas: RawBitmap, cancelFlag: CancelFlag,
-            viewPortOffsetX: Double, viewPortOffsetY: Double,
-            canvasOffsetX: Int, canvasOffsetY: Int) {
+            viewPortOffsetX: Double = 0.0, viewPortOffsetY: Double = 0.0,
+            canvasOffsetX: Int = 0, canvasOffsetY: Int = 0) {
         throw NotImplementedError("This camera doesn't support rendering stereo.")
     }
 
@@ -162,4 +162,17 @@ abstract class BaseCamera {
         return world.viewPlane.verticalResolution
     }
 
+    fun copyPositionAndOrientationFrom(other: BaseCamera) {
+        this.eye = other.eye
+        this.lookAt = other.lookAt
+        this.up = other.up
+
+        this.rollAngleInDegrees = other.rollAngleInDegrees
+        this.pitchAngleInDegrees = other.pitchAngleInDegrees
+        this.yawAngleInDegrees = other.yawAngleInDegrees
+    }
+
+    override fun toString(): String {
+        return "camera(pos: $eye, look at: $lookAt)"
+    }
 }

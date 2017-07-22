@@ -5,13 +5,17 @@ import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.world.World
 
-class StereoCamera(
-        val leftCamera: BaseCamera,
-        val rightCamera: BaseCamera)
-    : BaseCamera() {
-
+class StereoCamera<CameraType : BaseCamera>(
+        val leftCamera: CameraType,
+        val rightCamera: CameraType)
+    : BaseCamera()
+{
     var viewingMode: ViewingMode = ViewingMode.TRANSVERSE
     var stereoSeparationAngle: Angle = Angle.fromDegrees(15)
+        set(value) {
+            field = value
+            computeUvw()
+        }
 
     var pixelGap = 8
         set(newGap) {
@@ -24,37 +28,47 @@ class StereoCamera(
     protected override fun afterUvwComputed() {
         val x = computeHalfCameraSeparation()
 
-        leftCamera.eye = eye - x*cameraRight
-        leftCamera.lookAt = Point3D.zero + (cameraLookAt - x*cameraRight)
-        leftCamera.up = cameraUp
+        adjustCamera(leftCamera, -x)
+        adjustCamera(rightCamera, x)
+    }
 
-        rightCamera.eye = eye + x*cameraRight
-        rightCamera.lookAt = Point3D.zero + (cameraLookAt + x*cameraRight)
-        rightCamera.up = cameraUp
+    private fun adjustCamera(camera: CameraType, dx: Double) {
+        camera.eye = eye + dx*cameraRight
+        camera.lookAt = eye + cameraLookAt + dx*cameraRight
+        camera.up = cameraUp
+        camera.yawAngleInDegrees = 0.0
+        camera.rollAngleInDegrees = 0.0
+        camera.pitchAngleInDegrees = 0.0
+
+        if (camera is PinholeCamera) {
+            camera.fieldOfViewInDegrees = 30.0
+        }
     }
 
     override fun render(world: World, canvas: RawBitmap, cancelFlag: CancelFlag) {
-        val x = computeHalfCameraSeparation()
+        val halfCameraSeparation = computeHalfCameraSeparation()
 
         if (viewingMode == ViewingMode.PARALLEL) {
             leftCamera.renderStereo(world, canvas, cancelFlag,
-                    0.0, 0.0, 0, 0)
+                    viewPortOffsetX = halfCameraSeparation)
 
             if (cancelFlag.shouldCancel)
                 return
 
             rightCamera.renderStereo(world, canvas, cancelFlag,
-                    0.0, 0.0, world.viewPlane.horizontalResolution + pixelGap, 0)
+                    viewPortOffsetX = -halfCameraSeparation,
+                    canvasOffsetX = world.viewPlane.horizontalResolution + pixelGap)
         }
         else {
-            leftCamera.renderStereo(world, canvas, cancelFlag,
-                    0.0, 0.0, 0, 0)
+            rightCamera.renderStereo(world, canvas, cancelFlag,
+                    viewPortOffsetX = -halfCameraSeparation)
 
             if (cancelFlag.shouldCancel)
                 return
 
-            rightCamera.renderStereo(world, canvas, cancelFlag,
-                    0.0, 0.0, world.viewPlane.horizontalResolution + pixelGap, 0)
+            leftCamera.renderStereo(world, canvas, cancelFlag,
+                    viewPortOffsetX = halfCameraSeparation,
+                    canvasOffsetX = world.viewPlane.horizontalResolution + pixelGap)
         }
     }
 
@@ -75,6 +89,11 @@ class StereoCamera(
         return Math.max(
                 leftCamera.minNeededVerticalPixels(world),
                 rightCamera.minNeededVerticalPixels(world))
+    }
+
+    public fun forEachEyeCamera(action: CameraType.() -> Unit) {
+        leftCamera.action()
+        rightCamera.action()
     }
 }
 

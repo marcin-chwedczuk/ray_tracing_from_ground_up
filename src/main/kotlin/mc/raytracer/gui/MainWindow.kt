@@ -1,16 +1,17 @@
 package mc.raytracer.gui
 
 import mc.raytracer.RayTracingThread
+import mc.raytracer.cameras.BaseCamera
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.Resolution
 import mc.raytracer.util.RgbColor
+import mc.raytracer.util.StereoResolution
 import java.awt.Graphics
 import java.awt.event.*
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.awt.image.WritableRaster
 import java.io.File
-import java.io.FileFilter
 import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -19,13 +20,14 @@ import javax.swing.filechooser.FileNameExtensionFilter
 class MainWindow(val rayTracingThread: RayTracingThread)
     : JFrame() {
 
-    private var currentResolution = 4
+    private var currentResolution = 1
     private var supportedResolutions = arrayOf(
-            Resolution(100,80),
-            Resolution(200,160),
-            Resolution(400,320),
-            Resolution(800,640),
-            Resolution(810, 640) /* for stereo viewing */)
+            Resolution(100,80, scale=8),
+            Resolution(200,160, scale=4),
+            Resolution(400,320, scale=2),
+            Resolution(800,640, scale=1),
+            StereoResolution(400, 320, pixelGap=8), /* for stereo viewing */
+            StereoResolution(200, 160, pixelGap=4, scale=2))
 
     private var currentSampleNumber = 2
 
@@ -46,25 +48,19 @@ class MainWindow(val rayTracingThread: RayTracingThread)
         // default color model has AARRBBGG format
         val colorModel = ColorModel.getRGBdefault()
 
-        this.bitmap = RawBitmap(newResolution.horizontal, newResolution.vertical)
+        this.bitmap = RawBitmap(newResolution.canvasHorizontal, newResolution.canvasVertical)
         this.raster = colorModel.createCompatibleWritableRaster(
-                newResolution.horizontal, newResolution.vertical)
+                newResolution.canvasHorizontal, newResolution.canvasVertical)
 
         this.bufferedImage = BufferedImage(
                 colorModel, raster, colorModel.isAlphaPremultiplied, null)
 
         bitmap.clear(RgbColor.black.toArgb())
 
-        rayTracingThread.changeBitmap(bitmap)
+        rayTracingThread.changeResolution(bitmap, newResolution)
 
-        if (newResolution.horizontal >= 800 && newResolution.vertical >= 640) {
-            setSize(newResolution.horizontal, newResolution.vertical)
-            panel.setSize(newResolution.horizontal, newResolution.vertical)
-        }
-        else {
-            setSize(800, 640)
-            panel.setSize(800, 640)
-        }
+        setSize(newResolution.windowHorizontal, newResolution.windowVertical)
+        panel.setSize(newResolution.windowHorizontal, newResolution.windowVertical)
     }
 
     private fun updateBufferedImage() {
@@ -127,7 +123,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
         addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent?) {
                 rayTracingThread.updateRayTracer { rayTracer ->
-                    val step = 20.0
+                    val step = 10.0
 
                     when (e!!.keyCode) {
                         KeyEvent.VK_ESCAPE, KeyEvent.VK_Q -> {
@@ -137,7 +133,8 @@ class MainWindow(val rayTracingThread: RayTracingThread)
                             }
                         }
 
-                        KeyEvent.VK_1, KeyEvent.VK_2, KeyEvent.VK_3, KeyEvent.VK_4 -> {
+                        KeyEvent.VK_1, KeyEvent.VK_2, KeyEvent.VK_3, KeyEvent.VK_4,
+                        KeyEvent.VK_5, KeyEvent.VK_6 -> {
                             val index: Int = e.keyChar - '1'
 
                             currentResolution = index
@@ -150,34 +147,44 @@ class MainWindow(val rayTracingThread: RayTracingThread)
 
                         KeyEvent.VK_RIGHT -> {
                             rayTracer.camera.yawAngleInDegrees -= 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_LEFT -> {
                             rayTracer.camera.yawAngleInDegrees += 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_UP -> {
                             rayTracer.camera.pitchAngleInDegrees += 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_DOWN -> {
                             rayTracer.camera.pitchAngleInDegrees -= 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_R -> {
                             rayTracer.camera.rollAngleInDegrees += 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_T -> {
                             rayTracer.camera.rollAngleInDegrees -= 5.0
+                            afterCameraUpdate(rayTracer.camera)
                         }
 
                         KeyEvent.VK_W -> {
                             rayTracer.camera.moveForward(step)
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_S -> {
                             rayTracer.camera.moveBackwards(step)
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_D -> {
                             rayTracer.camera.moveRight(step)
+                            afterCameraUpdate(rayTracer.camera)
                         }
                         KeyEvent.VK_A -> {
                             rayTracer.camera.moveLeft(step)
+                            afterCameraUpdate(rayTracer.camera)
                         }
 
                         KeyEvent.VK_P -> {
@@ -208,5 +215,9 @@ class MainWindow(val rayTracingThread: RayTracingThread)
             updateBufferedImage()
         })
         timer.start()
+    }
+
+    private fun afterCameraUpdate(camera: BaseCamera) {
+        this.title = camera.toString()
     }
 }

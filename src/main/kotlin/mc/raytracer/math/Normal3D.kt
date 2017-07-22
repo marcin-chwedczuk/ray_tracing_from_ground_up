@@ -21,7 +21,7 @@ class Normal3D(val x: Double, val y:Double, val z:Double) {
     }
 
     override fun toString()
-        = "vec3($x, $y, $z)"
+        = "normal3(%.3f, %.3f, %.3f)".format(x,y,z)
 
     // custom operators --------------------------------
 
