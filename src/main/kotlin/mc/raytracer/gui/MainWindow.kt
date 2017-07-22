@@ -9,9 +9,11 @@ import java.awt.event.*
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.awt.image.WritableRaster
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.SwingUtilities
+import java.io.File
+import java.io.FileFilter
+import javax.imageio.ImageIO
+import javax.swing.*
+import javax.swing.filechooser.FileNameExtensionFilter
 
 
 class MainWindow(val rayTracingThread: RayTracingThread)
@@ -41,6 +43,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
     private fun changeToCurrentResolution() {
         val newResolution = supportedResolutions[currentResolution]
 
+        // default color model has AARRBBGG format
         val colorModel = ColorModel.getRGBdefault()
 
         this.bitmap = RawBitmap(newResolution.horizontal, newResolution.vertical)
@@ -70,6 +73,35 @@ class MainWindow(val rayTracingThread: RayTracingThread)
                 bitmap.rawArgbData)
 
         panel.paintImmediately(0, 0, panel.width, panel.height)
+    }
+
+    private fun saveCurrentImageToFile() {
+        val saveDialog = JFileChooser()
+
+        saveDialog.dialogTitle = "Save current image..."
+        saveDialog.fileFilter = FileNameExtensionFilter("PNG files (*.png)", "png")
+
+        val result = saveDialog.showSaveDialog(null)
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            var filePath = saveDialog.selectedFile.absolutePath
+
+            if (!filePath.endsWith("png", ignoreCase=true)) {
+                filePath += ".png"
+            }
+
+            try {
+                if (!ImageIO.write(bufferedImage, "PNG", File(filePath)))
+                    throw RuntimeException("ImageIO.write failed: Cannot find PNG format writer.")
+            }
+            catch(e: Exception) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Cannot save file: " + filePath + ". " + e.message,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE)
+            }
+        }
     }
 
     fun initUI() {
@@ -110,6 +142,10 @@ class MainWindow(val rayTracingThread: RayTracingThread)
 
                             currentResolution = index
                             changeToCurrentResolution()
+                        }
+
+                        KeyEvent.VK_0 -> {
+                            saveCurrentImageToFile()
                         }
 
                         KeyEvent.VK_RIGHT -> {

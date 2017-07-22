@@ -41,6 +41,8 @@ class RayTracer {
             pixelGap = 8
         }
 
+        camera = pinholeCamera
+
         world = World(viewPlane, RgbColor.grayscale(0.2), tracer)
     }
 

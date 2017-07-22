@@ -23,8 +23,8 @@ class RayTracingThread(val rayTracer: RayTracer)
         synchronized(fieldLock) {
             this.bitmap = bitmap
 
-            //this.rayTracer.viewPlane.changeResolutionPreservingViewPlaneWidth(
-            //        bitmap.width, bitmap.heigh)
+            this.rayTracer.viewPlane.changeResolutionPreservingViewPlaneWidth(
+                    bitmap.width, bitmap.heigh)
         }
     }
 
