@@ -1,5 +1,6 @@
 package mc.raytracer.gui
 
+import mc.raytracer.RayTracer
 import mc.raytracer.RayTracingThread
 import mc.raytracer.cameras.BaseCamera
 import mc.raytracer.util.RawBitmap
@@ -36,6 +37,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
     private lateinit var bufferedImage: BufferedImage
 
     private lateinit var panel: JPanel
+    private val keyboardState = KeyboardState()
 
     init {
         initUI()
@@ -120,87 +122,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
         }
         add(panel)
 
-        addKeyListener(object : KeyAdapter() {
-            override fun keyReleased(e: KeyEvent?) {
-                rayTracingThread.updateRayTracer { rayTracer ->
-                    val step = 10.0
-
-                    when (e!!.keyCode) {
-                        KeyEvent.VK_ESCAPE, KeyEvent.VK_Q -> {
-                            SwingUtilities.invokeLater {
-                                this@MainWindow.dispatchEvent(
-                                        WindowEvent(this@MainWindow, WindowEvent.WINDOW_CLOSING))
-                            }
-                        }
-
-                        KeyEvent.VK_1, KeyEvent.VK_2, KeyEvent.VK_3, KeyEvent.VK_4,
-                        KeyEvent.VK_5, KeyEvent.VK_6 -> {
-                            val index: Int = e.keyChar - '1'
-
-                            currentResolution = index
-                            changeToCurrentResolution()
-                        }
-
-                        KeyEvent.VK_0 -> {
-                            saveCurrentImageToFile()
-                        }
-
-                        KeyEvent.VK_RIGHT -> {
-                            rayTracer.camera.yawAngleInDegrees -= 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_LEFT -> {
-                            rayTracer.camera.yawAngleInDegrees += 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_UP -> {
-                            rayTracer.camera.pitchAngleInDegrees += 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_DOWN -> {
-                            rayTracer.camera.pitchAngleInDegrees -= 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_R -> {
-                            rayTracer.camera.rollAngleInDegrees += 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_T -> {
-                            rayTracer.camera.rollAngleInDegrees -= 5.0
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-
-                        KeyEvent.VK_W -> {
-                            rayTracer.camera.moveForward(step)
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_S -> {
-                            rayTracer.camera.moveBackwards(step)
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_D -> {
-                            rayTracer.camera.moveRight(step)
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-                        KeyEvent.VK_A -> {
-                            rayTracer.camera.moveLeft(step)
-                            afterCameraUpdate(rayTracer.camera)
-                        }
-
-                        KeyEvent.VK_P -> {
-                            currentSampleNumber++
-                            rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
-                                    currentSampleNumber*currentSampleNumber)
-                        }
-                        KeyEvent.VK_O -> {
-                            currentSampleNumber = Math.max(1, currentSampleNumber-1)
-                            rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
-                                    currentSampleNumber*currentSampleNumber)
-                        }
-                    }
-                }
-            }
-        })
+        keyboardState.registerListener(this)
 
         addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent?) {
@@ -213,8 +135,100 @@ class MainWindow(val rayTracingThread: RayTracingThread)
             // on Swing event thread.
 
             updateBufferedImage()
+            runKeyPressedListeners()
         })
         timer.start()
+    }
+
+    private fun runKeyPressedListeners() {
+        // updateRayTracer will stop rendering of
+        // the current frame, I want to do this only
+        // when we actually change the scene via key presses.
+        if (!keyboardState.hasPressedKeys) return
+
+        rayTracingThread.updateRayTracer { rayTracer ->
+            keyboardState.forPressedKeys { key ->
+                handleKeyPress(key, rayTracer)
+            }
+        }
+    }
+
+    private fun handleKeyPress(key: KeyboardState.KeyInfo, rayTracer: RayTracer) {
+        val step = 10.0
+
+        when (key.keyCode) {
+            KeyEvent.VK_ESCAPE, KeyEvent.VK_Q -> {
+                SwingUtilities.invokeLater {
+                    this@MainWindow.dispatchEvent(
+                            WindowEvent(this@MainWindow, WindowEvent.WINDOW_CLOSING))
+                }
+            }
+
+            KeyEvent.VK_1, KeyEvent.VK_2, KeyEvent.VK_3, KeyEvent.VK_4,
+            KeyEvent.VK_5, KeyEvent.VK_6 -> {
+                val index: Int = key.keyChar - '1'
+
+                currentResolution = index
+                changeToCurrentResolution()
+            }
+
+            KeyEvent.VK_0 -> {
+                saveCurrentImageToFile()
+            }
+
+            KeyEvent.VK_RIGHT -> {
+                rayTracer.camera.yawAngleInDegrees -= 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_LEFT -> {
+                rayTracer.camera.yawAngleInDegrees += 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_UP -> {
+                rayTracer.camera.pitchAngleInDegrees += 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_DOWN -> {
+                rayTracer.camera.pitchAngleInDegrees -= 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_R -> {
+                rayTracer.camera.rollAngleInDegrees += 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_T -> {
+                rayTracer.camera.rollAngleInDegrees -= 5.0
+                afterCameraUpdate(rayTracer.camera)
+            }
+
+            KeyEvent.VK_W -> {
+                rayTracer.camera.moveForward(step)
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_S -> {
+                rayTracer.camera.moveBackwards(step)
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_D -> {
+                rayTracer.camera.moveRight(step)
+                afterCameraUpdate(rayTracer.camera)
+            }
+            KeyEvent.VK_A -> {
+                rayTracer.camera.moveLeft(step)
+                afterCameraUpdate(rayTracer.camera)
+            }
+
+            KeyEvent.VK_P -> {
+                currentSampleNumber++
+                rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
+                        currentSampleNumber*currentSampleNumber)
+            }
+            KeyEvent.VK_O -> {
+                currentSampleNumber = Math.max(1, currentSampleNumber-1)
+                rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
+                        currentSampleNumber*currentSampleNumber)
+            }
+        }
     }
 
     private fun afterCameraUpdate(camera: BaseCamera) {
