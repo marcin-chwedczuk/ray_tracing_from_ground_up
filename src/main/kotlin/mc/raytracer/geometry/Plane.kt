@@ -14,16 +14,13 @@ class Plane(
     /* Plane equation: p belongs to Plane
      * when (p-a) dot n = 0.
      */
-
     override fun hit(ray: Ray): HitResult {
         val t = (a-ray.origin).dot(n) / ray.direction.dot(n)
 
         if (t >= K_EPSILON) {
-            return Hit(t, ShadingInfo(
-                objectHit=true,
+            return Hit(tmin = t,
                 localHitPoint=ray.origin + ray.direction*t,
-                material=material,
-                normalAtHitPoint=n))
+                normalAtHitPoint = n)
         }
 
         return Miss.instance

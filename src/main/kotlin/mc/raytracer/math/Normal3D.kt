@@ -48,6 +48,8 @@ class Normal3D(val x: Double, val y:Double, val z:Double) {
     companion object {
         fun fromVector(vec: Vector3D)
             = Normal3D(vec.norm())
+
+        val axisY = Normal3D(0,1,0)
     }
 }
 

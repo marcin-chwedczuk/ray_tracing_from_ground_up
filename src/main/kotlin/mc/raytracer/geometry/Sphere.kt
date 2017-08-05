@@ -31,21 +31,17 @@ class Sphere(
         // smaller root
         var t: Double = (-b - deltaSqrt) / (2.0*a)
         if (t > K_EPSILON) {
-            return Hit(t, ShadingInfo(
-                objectHit = true,
-                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius),
+            return Hit(tmin = t,
                 localHitPoint = ray.origin+ray.direction*t,
-                material = material))
+                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
         }
 
         // larger root
         t = (-b + deltaSqrt) / (2.0*a)
         if (t > K_EPSILON) {
-            return Hit(t, ShadingInfo(
-                objectHit = true,
-                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius),
+            return Hit(tmin = t,
                 localHitPoint = ray.origin+ray.direction*t,
-                material = material))
+                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
         }
 
         return Miss.instance

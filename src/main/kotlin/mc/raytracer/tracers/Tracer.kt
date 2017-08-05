@@ -6,5 +6,6 @@ import mc.raytracer.world.World
 
 interface Tracer {
     fun init(world: World)
+
     fun traceRay(ray: Ray, depth: Int = 0): RgbColor
 }

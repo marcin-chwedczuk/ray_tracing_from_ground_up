@@ -46,10 +46,8 @@ class Rectangle2D(
         if (ddotb < 0.0 || ddotb > b.lengthSquared)
             return Miss.instance
 
-        return Hit(t, ShadingInfo(
-            objectHit = true,
-            localHitPoint = p,
-            normalAtHitPoint = Normal3D.fromVector(normal),
-            material = material))
+        return Hit(tmin = t,
+                localHitPoint = p,
+                normalAtHitPoint = Normal3D.fromVector(normal))
     }
 }
