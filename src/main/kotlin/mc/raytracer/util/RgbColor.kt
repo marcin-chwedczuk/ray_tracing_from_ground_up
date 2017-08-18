@@ -58,6 +58,7 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         val white = RgbColor(1.0, 1.0, 1.0)
         val black = RgbColor(0.0, 0.0, 0.0)
         val red = RgbColor(1.0, 0.0, 0.0)
+        val orange = RgbColor(1.0, 0.529, 0.0)
         val yellow = RgbColor(1.0,1.0,0.0)
         val green = RgbColor(0.0, 1.0, 0.0)
         val blue = RgbColor(0.0, 0.0, 1.0)

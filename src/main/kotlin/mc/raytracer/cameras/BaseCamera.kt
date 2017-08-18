@@ -154,6 +154,15 @@ abstract class BaseCamera {
         moveRight(-distance)
     }
 
+    fun moveUp(distance: Double) {
+        val delta = cameraUp * distance
+
+        eye += delta
+        lookAt += delta
+    }
+
+    fun moveDown(distance: Double) = moveUp(-distance)
+
     open fun minNeededHorizontalPixels(world: World): Int {
         return world.viewPlane.horizontalResolution
     }

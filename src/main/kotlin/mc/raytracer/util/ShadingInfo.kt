@@ -20,6 +20,9 @@ class ShadingInfo(
      */
     val localHitPoint: Point3D,
 
+    /**
+     * Normal at hit point in world coordinates.
+     */
     val normalAtHitPoint: Normal3D,
 
     val material: Material,

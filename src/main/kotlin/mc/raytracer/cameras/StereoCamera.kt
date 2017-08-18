@@ -5,11 +5,19 @@ import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.world.World
 
-class StereoCamera<CameraType : BaseCamera>(
+class StereoCamera<out CameraType : BaseCamera>(
         val leftCamera: CameraType,
         val rightCamera: CameraType)
     : BaseCamera()
 {
+
+    init {
+        if (leftCamera === rightCamera)
+            throw IllegalArgumentException(
+                    "Since left and right cameras will have different coordinates, " +
+                    "they must be two distinct instances.")
+    }
+
     var viewingMode: ViewingMode = ViewingMode.TRANSVERSE
     var stereoSeparationAngle: Angle = Angle.fromDegrees(15)
         set(value) {
