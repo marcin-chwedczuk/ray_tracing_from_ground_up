@@ -11,6 +11,7 @@ import mc.raytracer.geometry.primitives.Torus
 import mc.raytracer.lighting.AmbientLight
 import mc.raytracer.lighting.DirectionalLight
 import mc.raytracer.lighting.PointLight
+import mc.raytracer.lighting.SpotLight
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.MatteMaterial
 import mc.raytracer.material.StaticColorMaterial
@@ -36,11 +37,12 @@ class RayTracer {
     init {
         viewPlane = ViewPlane(400, 320, pixelSize = 2.0)
         viewPlane.configureNumberOfSamplesPerPixel(4)
+        // viewPlane.showOutOfGamutErrors = true
 
         val tracer = RayCasterTracer()
 
         camera = PinholeCamera()
-        camera.moveUp(100.0)
+        //camera.moveUp(100.0)
         world = World(viewPlane, RgbColor.grayscale(0.2), tracer)
     }
 
@@ -91,73 +93,47 @@ class RayTracer {
         val rnd = Random()
         rnd.setSeed(12345)
 
-        /*
-        val big = Sphere(Point3D(20,0,-270), 20.0)
-        big.material = ChessboardMaterial(RgbColor.red, RgbColor.black, patternSize = 1.0)
-        world.addObject(big)
-        */
-
         world.ambientLight = AmbientLight(RgbColor.white)
-
-
-        /*
-        for (i in 1..1) {
-            val location = Point3D(-50 + rnd.nextInt(100), rnd.nextInt(200), -50 + rnd.nextInt(100))
-
-            val sphere = Sphere(location, 4.0)
-            sphere.material = StaticColorMaterial(RgbColor.white)
-            world.addObject(sphere)
-
-            val pointLight = PointLight(location, RgbColor.white)
-            world.addLight(pointLight)
-        }
-        */
-
-        world.addLight(DirectionalLight(Vector3D(-1,-1,-1), RgbColor.white, radianceScalingFactor = 3.0))
-        // world.addLight(PointLight(Point3D(0, 200, 0), RgbColor.white))
+        // world.addLight(DirectionalLight(-Vector3D.axisZ, RgbColor.white, radianceScalingFactor = 1.0))
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
-        // floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-        floor.material = MatteMaterial(
-                RgbColor.grayscale(1.0),
-                ambientCoefficient = 0.1, diffuseCoefficient = 1.0)
+        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
+          floor.material = MatteMaterial(RgbColor.white)
 
 
-        /*
-        val sphere = Sphere(Point3D(0, 100, -30), 30.0).apply {
-            material = MatteMaterial(RgbColor.red, ambientCoefficient = .2, diffuseCoefficient = 1.0)
+        GlobalRandom.setSeed(12349)
+
+
+        val size = 500
+
+        for (i in 1..10) {
+            val location = GlobalRandom.nextPoint(-size,size, 200,250, -size,size)
+            val lookAt = GlobalRandom.nextPoint(-size,size, 0,-3000, -size,size)
+
+            val color = RgbColor.randomColor()
+
+            world.addLight(SpotLight(location, -Vector3D.axisY, Angle.fromDegrees(15),
+                    color, radianceScalingFactor = 2.0, cutOffExponent = 400.0))
+
         }
-        world.addObject(sphere)
 
-        val sphere2 = Sphere(Point3D(40, 100, -90), 30.0).apply {
-            material = MatteMaterial(RgbColor.orange, ambientCoefficient = .2, diffuseCoefficient = 1.0)
+
+
+
+        for (i in 1..20) {
+            val location = GlobalRandom.nextPoint(-size,size, 13,13, -size,size)
+
+            world.addObject(Sphere(location, 13.0).apply {
+                material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
+            })
         }
-        world.addObject(sphere2)
 
-        val cylinder = OpenCylinder(0.0, 30.0, 90.0).apply {
-            material = MatteMaterial(RgbColor.green, ambientCoefficient = .2, diffuseCoefficient = 1.0)
-        }
-        world.addObject(cylinder) */
 
-        /*
-        for (i in 1..7) {
-            val torus = Torus(Point3D(-100 + rnd.nextInt(200), 0, -100 +rnd.nextInt(200)), 15+rnd.nextDouble()*10, 10.0).apply {
-                material = MatteMaterial(
-                        RgbColor.randomColor(),
-                        ambientCoefficient = .2,
-                        diffuseCoefficient = 1.0)
-            }
-            world.addObject(torus)
-        }*/
+        val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
 
-        val torus = Torus(Point3D.zero, 300.0, 130.0).apply {
-            material = MatteMaterial(
-                    RgbColor.randomColor(),
-                    ambientCoefficient = .5,
-                    diffuseCoefficient = 1.0)
+            material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
         }
         world.addObject(torus)
-
         world.addObject(floor)
 
     }

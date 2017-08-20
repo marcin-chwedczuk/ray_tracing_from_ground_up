@@ -1,5 +1,6 @@
 package mc.raytracer.util
 
+import mc.raytracer.math.Point3D
 import java.util.*
 
 object GlobalRandom {
@@ -22,6 +23,20 @@ object GlobalRandom {
 
     fun nextDouble()
         = rnd.nextDouble()
+
+    fun nextPoint(xMin: Int, xMax: Int,
+                  yMin: Int, yMax: Int,
+                  zMin: Int, zMax: Int)
+        = nextPoint(xMin.toDouble(), xMax.toDouble(),
+                    yMin.toDouble(), yMax.toDouble(),
+                    zMin.toDouble(), zMax.toDouble())
+
+    fun nextPoint(xMin: Double, xMax: Double,
+                  yMin: Double, yMax: Double,
+                  zMin: Double, zMax: Double)
+        = Point3D(xMin + rnd.nextDouble() * (xMax - xMin),
+                  yMin + rnd.nextDouble() * (yMax - yMin),
+                  zMin + rnd.nextDouble() * (zMax - zMin))
 
     fun shuffle(list: List<*>) {
         Collections.shuffle(list, rnd)

@@ -14,10 +14,22 @@ class Angle {
         = angleInRadians
 
     override fun toString()
-        = "(angle ${toDegrees()}\u00B0)"
+        = "(innerCutOff ${toDegrees()}\u00B0)"
 
     fun tan(): Double
             = Math.tan(angleInRadians)
+
+    fun sin(): Double
+            = Math.sin(angleInRadians)
+
+    fun cos(): Double
+            = Math.cos(angleInRadians)
+
+    operator fun times(x: Int): Angle
+        = this * x.toDouble()
+
+    operator fun times(x: Double): Angle
+        = Angle(angleInRadians * x)
 
     operator fun div(x: Int): Angle
         = this / x.toDouble()

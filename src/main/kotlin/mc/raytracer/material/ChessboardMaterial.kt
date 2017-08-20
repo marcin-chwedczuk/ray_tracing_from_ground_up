@@ -7,10 +7,15 @@ import org.w3c.dom.css.RGBColor
 
 // This is simplified pattern - only works for planes in XZ plane
 class ChessboardMaterial(
-        val color1: RgbColor,
-        val color2: RgbColor,
-        val patternSize: Double = 1.0)
+        color1: RgbColor,
+        color2: RgbColor,
+        val patternSize: Double = 1.0,
+        ambientCoefficient: Double = 0.10,
+        diffuseCoefficient: Double = 1.0)
         : Material {
+
+    private val material1 = MatteMaterial(color1, ambientCoefficient, diffuseCoefficient)
+    private val material2 = MatteMaterial(color2, ambientCoefficient, diffuseCoefficient)
 
     override fun shade(info: ShadingInfo): RgbColor {
         // add "irrational" number to avoid noise when object is put
@@ -32,8 +37,8 @@ class ChessboardMaterial(
 
         val total = (xn%2) + (yn%2) + (zn%2)
         if ((total % 2) == 0)
-            return color1
+            return material1.shade(info)
 
-        return color2
+        return material2.shade(info)
     }
 }

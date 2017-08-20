@@ -6,7 +6,7 @@ import mc.raytracer.util.ShadingInfo
 
 public class MatteMaterial(
     color: RgbColor,
-    ambientCoefficient: Double = 0.01,
+    ambientCoefficient: Double = 0.10,
     diffuseCoefficient: Double = 1.0
 ): Material {
 
