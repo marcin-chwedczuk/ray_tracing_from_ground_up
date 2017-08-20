@@ -1,8 +1,6 @@
 package mc.raytracer
 
-import mc.raytracer.cameras.BaseCamera
-import mc.raytracer.cameras.PinholeCamera
-import mc.raytracer.cameras.StereoCamera
+import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
 import mc.raytracer.geometry.Sphere
@@ -14,8 +12,12 @@ import mc.raytracer.lighting.PointLight
 import mc.raytracer.lighting.SpotLight
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.MatteMaterial
+import mc.raytracer.material.PhongMaterial
 import mc.raytracer.material.StaticColorMaterial
 import mc.raytracer.math.*
+import mc.raytracer.sampling.CircleSampler
+import mc.raytracer.sampling.MultiJitteredSampler
+import mc.raytracer.sampling.SquareSampler
 import mc.raytracer.threading.CancelFlag
 import mc.raytracer.tracers.RayCasterTracer
 import mc.raytracer.util.GlobalRandom
@@ -41,7 +43,10 @@ class RayTracer {
 
         val tracer = RayCasterTracer()
 
+        //val tmp = ThinLensCamera(CircleSampler.fromSquareSampler(MultiJitteredSampler(numberOfSamples = 36)))
         camera = PinholeCamera()
+        //tmp.lensRadius = 1.4
+        //tmp.focalPlaneDistance = 200.0
         //camera.moveUp(100.0)
         world = World(viewPlane, RgbColor.grayscale(0.2), tracer)
     }
@@ -98,7 +103,7 @@ class RayTracer {
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-          floor.material = MatteMaterial(RgbColor.white)
+        // floor.material = MatteMaterial(RgbColor.white)
 
 
         GlobalRandom.setSeed(12349)
@@ -106,32 +111,32 @@ class RayTracer {
 
         val size = 500
 
-        for (i in 1..10) {
+        for (i in 1..5) {
             val location = GlobalRandom.nextPoint(-size,size, 200,250, -size,size)
             val lookAt = GlobalRandom.nextPoint(-size,size, 0,-3000, -size,size)
 
             val color = RgbColor.randomColor()
 
-            world.addLight(SpotLight(location, -Vector3D.axisY, Angle.fromDegrees(15),
-                    color, radianceScalingFactor = 2.0, cutOffExponent = 400.0))
+            world.addObject(Sphere(location, 1.0).apply {
+                material = StaticColorMaterial(color)
+            })
+            world.addLight(PointLight(location, color))
 
         }
 
+        world.addLight(DirectionalLight(-Vector3D.axisY, RgbColor.red))
 
-
-
-        for (i in 1..20) {
+        for (i in 1..15) {
             val location = GlobalRandom.nextPoint(-size,size, 13,13, -size,size)
 
             world.addObject(Sphere(location, 13.0).apply {
-                material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
+                material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 40.0)
             })
         }
 
-
         val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
 
-            material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
+            material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
         }
         world.addObject(torus)
         world.addObject(floor)
