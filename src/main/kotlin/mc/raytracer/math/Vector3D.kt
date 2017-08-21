@@ -7,6 +7,9 @@ class Vector3D(val x: Double, val y:Double, val z:Double) {
     constructor(x: Int, y: Int, z: Int)
         : this(x.toDouble(), y.toDouble(), z.toDouble())
 
+    constructor(normal: Normal3D)
+        : this(normal.x, normal.y, normal.z)
+
     val length: Double
         get() = Math.sqrt(x*x + y*y + z*z)
 

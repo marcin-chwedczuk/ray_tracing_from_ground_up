@@ -3,6 +3,7 @@ package mc.raytracer.sampling
 import mc.raytracer.math.PI
 import mc.raytracer.math.Point2D
 import mc.raytracer.math.Point3D
+import mc.raytracer.math.Vector3D
 import java.lang.Math.*
 
 class HemisphereSampler private constructor(
@@ -16,6 +17,11 @@ class HemisphereSampler private constructor(
     fun nextSampleOnUnitHemisphere()
             = samples[nextShuffledIndex()]
 
+    fun nextVectorOnUnitHemispehere(): Vector3D {
+        val point = nextSampleOnUnitHemisphere()
+        return point - Point3D.zero
+    }
+
     private fun  mapSamplesToHemisphere(squareSamples: List<Point2D>): ArrayList<Point3D> {
         val hemisphereSamples: ArrayList<Point3D> = ArrayList(squareSamples.size)
 
@@ -25,10 +31,10 @@ class HemisphereSampler private constructor(
             val cos_theta = pow((1.0 - squareSample.y), 1.0/(cosineDistribution+1.0))
             val sin_theta = sqrt (1.0 - cos_theta*cos_theta)
             val pu = sin_theta * cos_phi
-            val pv = sin_theta * sin_phi
             val pw = cos_theta
+            val pv = sin_theta * sin_phi
 
-            hemisphereSamples.add(Point3D(pu, pv, pw));
+            hemisphereSamples.add(Point3D(pu, pw, pv))
         }
 
         return hemisphereSamples

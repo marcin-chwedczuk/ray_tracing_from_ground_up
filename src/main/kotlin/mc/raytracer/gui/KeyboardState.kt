@@ -30,6 +30,10 @@ class KeyboardState {
         }
     }
 
+    fun clearKey(key: KeyInfo) {
+        pressedKeys.remove(key)
+    }
+
     public class KeyInfo(
         val keyCode: Int,
         val keyChar: Char
@@ -49,4 +53,5 @@ class KeyboardState {
             return keyCode
         }
     }
+
 }

@@ -3,6 +3,7 @@ package mc.raytracer.gui
 import mc.raytracer.RayTracer
 import mc.raytracer.RayTracingThread
 import mc.raytracer.cameras.BaseCamera
+import mc.raytracer.lighting.AmbientOccluder
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.Resolution
 import mc.raytracer.util.RgbColor
@@ -148,12 +149,12 @@ class MainWindow(val rayTracingThread: RayTracingThread)
 
         rayTracingThread.updateRayTracer { rayTracer ->
             keyboardState.forPressedKeys { key ->
-                handleKeyPress(key, rayTracer)
+                handleKeyPress(keyboardState, key, rayTracer)
             }
         }
     }
 
-    private fun handleKeyPress(key: KeyboardState.KeyInfo, rayTracer: RayTracer) {
+    private fun handleKeyPress(sender: KeyboardState, key: KeyboardState.KeyInfo, rayTracer: RayTracer) {
         val step = 10.0
 
         when (key.keyCode) {
@@ -174,6 +175,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
 
             KeyEvent.VK_0 -> {
                 saveCurrentImageToFile()
+                sender.clearKey(key)
             }
 
             KeyEvent.VK_RIGHT -> {
@@ -227,6 +229,15 @@ class MainWindow(val rayTracingThread: RayTracingThread)
                 currentSampleNumber = Math.max(1, currentSampleNumber-1)
                 rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
                         currentSampleNumber*currentSampleNumber)
+            }
+
+            KeyEvent.VK_L -> {
+                if (rayTracer.world.ambientLight is AmbientOccluder) {
+                    rayTracer.enableAmbientOcclusion(false)
+                }
+                else {
+                    rayTracer.enableAmbientOcclusion(true)
+                }
             }
         }
     }

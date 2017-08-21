@@ -6,16 +6,14 @@ import mc.raytracer.geometry.Plane
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.geometry.primitives.OpenCylinder
 import mc.raytracer.geometry.primitives.Torus
-import mc.raytracer.lighting.AmbientLight
-import mc.raytracer.lighting.DirectionalLight
-import mc.raytracer.lighting.PointLight
-import mc.raytracer.lighting.SpotLight
+import mc.raytracer.lighting.*
 import mc.raytracer.material.ChessboardMaterial
 import mc.raytracer.material.MatteMaterial
 import mc.raytracer.material.PhongMaterial
 import mc.raytracer.material.StaticColorMaterial
 import mc.raytracer.math.*
 import mc.raytracer.sampling.CircleSampler
+import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.sampling.SquareSampler
 import mc.raytracer.threading.CancelFlag
@@ -48,7 +46,7 @@ class RayTracer {
         //tmp.lensRadius = 1.4
         //tmp.focalPlaneDistance = 200.0
         //camera.moveUp(100.0)
-        world = World(viewPlane, RgbColor.grayscale(0.2), tracer)
+        world = World(viewPlane, RgbColor.black, tracer)
     }
 
     fun enableStereoMode(): StereoCamera<PinholeCamera> {
@@ -81,6 +79,22 @@ class RayTracer {
         }
     }
 
+    public fun enableAmbientOcclusion(enable: Boolean) {
+        val isEnabled = (world.ambientLight is AmbientOccluder)
+
+        if (isEnabled == enable)
+            return
+
+        if (isEnabled) {
+            world.ambientLight = AmbientLight(RgbColor.white)
+        }
+        else {
+            world.ambientLight = AmbientOccluder(
+                    RgbColor.white,
+                    HemisphereSampler.fromSquareSampler(MultiJitteredSampler(256)))
+        }
+    }
+
     fun render(canvas: RawBitmap, cancelFlag: CancelFlag) {
         val minH = camera.minNeededHorizontalPixels(world)
         val minV = camera.minNeededVerticalPixels(world)
@@ -98,18 +112,20 @@ class RayTracer {
         val rnd = Random()
         rnd.setSeed(12345)
 
-        world.ambientLight = AmbientLight(RgbColor.white)
+        enableAmbientOcclusion(false)
+
         // world.addLight(DirectionalLight(-Vector3D.axisZ, RgbColor.white, radianceScalingFactor = 1.0))
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-        floor.material = MatteMaterial(RgbColor.white)
+        floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.2)
 
 
         GlobalRandom.setSeed(123489)
 
 
         val size = 500
+
 
 
         val rot4 = Matrix4.rotationMatrix(Vector3D.axisY, Angle.fromDegrees(120))
@@ -120,6 +136,7 @@ class RayTracer {
         world.addLight(SpotLight(Point3D.zero - vec, vec, Angle.fromDegrees(50), RgbColor.red,radianceScalingFactor = 2.3))
         world.addLight(SpotLight(Point3D.zero - vec2, vec2, Angle.fromDegrees(50), RgbColor.green,radianceScalingFactor = 2.3))
         world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 2.3))
+
         /*
         for (i in 1..8) {
             val location = GlobalRandom.nextPoint(-size,size, 200,250, -size,size)

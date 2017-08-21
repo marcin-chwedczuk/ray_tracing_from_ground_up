@@ -26,7 +26,7 @@ class World(
     val objects: ArrayList<GeometricObject> = ArrayList()
 
     val lights = mutableListOf<LightWithShadowSupport>()
-    var ambientLight = AmbientLight(color=RgbColor.white)
+    var ambientLight: Light = AmbientLight(color=RgbColor.white)
 
     fun addObject(obj: GeometricObject) {
         objects.add(obj)
@@ -76,7 +76,8 @@ class World(
                 world = this)
     }
 
-    public fun existsObjectInDirection(shadowRay: Ray, maxDistance: Double): Boolean {
+    public fun existsObjectInDirection(shadowRay: Ray,
+                                       maxDistance: Double = Double.MAX_VALUE): Boolean {
         for (obj in objects) {
             if (!obj.material.castsShadows) continue
 
