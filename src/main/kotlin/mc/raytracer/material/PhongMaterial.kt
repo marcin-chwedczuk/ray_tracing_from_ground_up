@@ -2,6 +2,7 @@ package mc.raytracer.material
 
 import mc.raytracer.material.brdf.GlossySpecularBRDF
 import mc.raytracer.material.brdf.LambertianBRDF
+import mc.raytracer.math.Ray
 import mc.raytracer.util.*
 import mc.raytracer.util.ShadingInfo
 
@@ -11,7 +12,7 @@ public class PhongMaterial(
     diffuseCoefficient: Double = 1.0,
     specularCoefficient: Double = 1.0,
     specularExponent: Double = 300.0
-): Material {
+): Material() {
 
     private var ambientBrdf = LambertianBRDF(color, ambientCoefficient)
     private var diffuseBrdf = LambertianBRDF(color, diffuseCoefficient)
@@ -30,12 +31,21 @@ public class PhongMaterial(
             val ndotwi = info.normalAtHitPoint.dot(wi)
 
             if (ndotwi > 0.0) {
-                val brdf =
-                        diffuseBrdf.evaluate(info, wo, wi) +
-                        specularBrdf.evaluate(info, wo, wi)
+                var hitPointInShadow = false
 
-                L += brdf.multiplyComponentwise(
-                        light.computeLuminanceContributedByLight(info)) * ndotwi
+                if (light.castsShadows) {
+                    val shadowRay = Ray(info.hitPoint, wi)
+                    hitPointInShadow = light.isHitPointInShadow(info, shadowRay)
+                }
+
+                if (!hitPointInShadow) {
+                    val brdf =
+                            diffuseBrdf.evaluate(info, wo, wi) +
+                            specularBrdf.evaluate(info, wo, wi)
+
+                    L += brdf.multiplyComponentwise(
+                            light.computeLuminanceContributedByLight(info)) * ndotwi
+                }
             }
         }
 

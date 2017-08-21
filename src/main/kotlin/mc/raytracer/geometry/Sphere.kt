@@ -11,10 +11,32 @@ class Sphere(
         val radius: Double
     ): GeometricObject() {
 
-    /* Circle equation: (p-center) dot (p-center) = radius^2
-     */
-
     override fun hit(ray: Ray): HitResult {
+        val t = findIntersection(ray)
+
+        if (t >= K_EPSILON) {
+            val temp = ray.origin - center
+
+            return Hit(tmin = t,
+                localHitPoint = ray.origin+ray.direction*t,
+                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
+        }
+        else {
+            return Miss.instance
+        }
+    }
+
+    override fun shadowHit(shadowRay: Ray): Double? {
+        val t = findIntersection(shadowRay)
+        return if (t >= K_EPSILON) t else null
+    }
+
+    /**
+     * Returns value {@code t} such that {@code ray.origin + ray.direction*t}
+     * is the nearest point on the sphere that intersects the ray.
+     * Returns {@code 0.0} when no such point exists.
+     */
+    private fun findIntersection(ray: Ray): Double {
         val a = ray.direction.dot(ray.direction)
 
         val temp = ray.origin - center
@@ -24,26 +46,22 @@ class Sphere(
         // compute solutions to quadratic equation
         val delta = b*b - 4.0*a*c
         if (delta < 0.0)
-            return Miss.instance
+            return 0.0
 
         val deltaSqrt = Math.sqrt(delta)
 
         // smaller root
         var t: Double = (-b - deltaSqrt) / (2.0*a)
-        if (t > K_EPSILON) {
-            return Hit(tmin = t,
-                localHitPoint = ray.origin+ray.direction*t,
-                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
+        if (t >= K_EPSILON) {
+            return t
         }
 
         // larger root
         t = (-b + deltaSqrt) / (2.0*a)
-        if (t > K_EPSILON) {
-            return Hit(tmin = t,
-                localHitPoint = ray.origin+ray.direction*t,
-                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
+        if (t >= K_EPSILON) {
+            return t
         }
 
-        return Miss.instance
+        return 0.0
     }
 }

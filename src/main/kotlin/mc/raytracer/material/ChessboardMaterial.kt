@@ -12,7 +12,7 @@ class ChessboardMaterial(
         val patternSize: Double = 1.0,
         ambientCoefficient: Double = 0.10,
         diffuseCoefficient: Double = 1.0)
-        : Material {
+        : Material() {
 
     private val material1 = MatteMaterial(color1, ambientCoefficient, diffuseCoefficient)
     private val material2 = MatteMaterial(color2, ambientCoefficient, diffuseCoefficient)

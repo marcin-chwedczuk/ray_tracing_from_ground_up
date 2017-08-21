@@ -61,6 +61,16 @@ class Cuboid(
         return result
     }
 
+    override fun shadowHit(shadowRay: Ray): Double? {
+        for(wall in walls) {
+            val shadowT = wall.shadowHit(shadowRay)
+            if (shadowT !== null)
+                return shadowT
+        }
+
+        return null
+    }
+
     companion object {
         fun cube(center: Point3D, sideLength: Double)
             = Cuboid(center, sideLength, sideLength, sideLength)

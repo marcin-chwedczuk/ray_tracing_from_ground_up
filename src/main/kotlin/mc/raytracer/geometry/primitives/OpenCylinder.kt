@@ -70,4 +70,43 @@ class OpenCylinder(
         return Miss.instance
     }
 
+    override fun shadowHit(ray: Ray): Double? {
+        val ox = ray.origin.x
+        val oy = ray.origin.y
+        val oz = ray.origin.z
+        val dx = ray.direction.x
+        val dy = ray.direction.y
+        val dz = ray.direction.z
+
+        val a = dx * dx + dz * dz
+        val b = 2.0 * (ox * dx + oz * dz)
+        val c = ox * ox + oz * oz - radius * radius
+        val delta = b * b - 4.0 * a * c
+
+        if (delta < 0.0)
+            return null
+
+        val deltaSqrt = sqrt(delta)
+        val _2a = 2.0 * a
+
+        val t1 = (-b - deltaSqrt) / _2a    // smaller root
+        if (t1 >= K_EPSILON) {
+            val yHit = oy + t1 * dy
+
+            if (yHit > yBottom && yHit < yTop) {
+                return t1
+            }
+        }
+
+        val t2 = (-b + deltaSqrt) / _2a
+        if (t2 >= K_EPSILON) {
+            val yHit = oy + t2 * dy
+
+            if (yHit > yBottom && yHit < yTop) {
+                return t2
+            }
+        }
+
+        return null
+    }
 }

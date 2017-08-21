@@ -8,7 +8,7 @@ public class MatteMaterial(
     color: RgbColor,
     ambientCoefficient: Double = 0.10,
     diffuseCoefficient: Double = 1.0
-): Material {
+): Material() {
 
     private var ambientBrdf = LambertianBRDF(color, ambientCoefficient)
     private var diffuseBrdf = LambertianBRDF(color, diffuseCoefficient)

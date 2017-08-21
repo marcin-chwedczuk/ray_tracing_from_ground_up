@@ -11,11 +11,9 @@ class Plane(
         val n: Normal3D)
     : GeometricObject() {
 
-    /* Plane equation: p belongs to Plane
-     * when (p-a) dot n = 0.
-     */
+
     override fun hit(ray: Ray): HitResult {
-        val t = (a-ray.origin).dot(n) / ray.direction.dot(n)
+        val t = findIntersection(ray)
 
         if (t >= K_EPSILON) {
             return Hit(tmin = t,
@@ -24,5 +22,18 @@ class Plane(
         }
 
         return Miss.instance
+    }
+
+    override fun shadowHit(shadowRay: Ray): Double? {
+        val t = findIntersection(shadowRay)
+        return if (t >= K_EPSILON) t else null
+    }
+
+    private fun findIntersection(ray: Ray): Double {
+        // Plane equation: p belongs to Plane
+        // when (p-a) dot n = 0.
+
+        val t = (a-ray.origin).dot(n) / ray.direction.dot(n)
+        return t
     }
 }

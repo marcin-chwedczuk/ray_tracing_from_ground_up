@@ -10,8 +10,10 @@ abstract class GeometricObject {
         StaticColorMaterial(RgbColor.white)
 
     abstract fun hit(ray: Ray): HitResult
+    abstract fun shadowHit(shadowRay: Ray): Double?
 
     companion object {
+        // TODO: @mc define this separately for each gemetric object
         val K_EPSILON = 0.0001
     }
 }

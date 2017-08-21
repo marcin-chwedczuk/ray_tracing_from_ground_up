@@ -17,37 +17,40 @@ class Rectangle2D(
 
     val normal = (spanA cross spanB).norm()
 
-    fun getBoundingBox(): BoundingBox {
-	    val delta = 0.0001
+    override fun hit(ray: Ray): HitResult {
+        val t = findIntersection(ray)
 
-        val a = spanA; val b = spanB; val p0 = point
+        if (t <= K_EPSILON)
+            return Miss.instance
 
-	    return BoundingBox(
-            min(p0.x, p0.x + a.x + b.x) - delta, max(p0.x, p0.x + a.x + b.x) + delta,
-            min(p0.y, p0.y + a.y + b.y) - delta, max(p0.y, p0.y + a.y + b.y) + delta,
-            min(p0.z, p0.z + a.z + b.z) - delta, max(p0.z, p0.z + a.z + b.z) + delta)
+        return Hit(tmin = t,
+                localHitPoint = Point3D.zero + ((ray.origin + ray.direction*t) - point),
+                normalAtHitPoint = Normal3D.fromVector(normal))
     }
 
-    override fun hit(ray: Ray): HitResult {
+    override fun shadowHit(shadowRay: Ray): Double? {
+        val t = findIntersection(shadowRay)
+        return if (t >= K_EPSILON) t else null
+    }
+
+    private fun findIntersection(ray: Ray): Double {
         val p0 = point; val a = spanA; val b = spanB
         val t = ((p0 - ray.origin) dot normal) / (ray.direction dot normal)
 
         if (t <= K_EPSILON)
-            return Miss.instance
+            return 0.0
 
         val p = ray.origin + t*ray.direction
         val d = p - p0
 
         val ddota = d dot a
         if (ddota < 0.0 || ddota > a.lengthSquared)
-            return Miss.instance
+            return 0.0
 
         val ddotb = d dot b
         if (ddotb < 0.0 || ddotb > b.lengthSquared)
-            return Miss.instance
+            return 0.0
 
-        return Hit(tmin = t,
-                localHitPoint = p,
-                normalAtHitPoint = Normal3D.fromVector(normal))
+        return t
     }
 }

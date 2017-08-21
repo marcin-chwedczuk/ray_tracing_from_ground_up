@@ -40,8 +40,25 @@ class Torus(
     }
 
     override fun hit(ray: Ray): HitResult {
-        if (!boundingBox.isIntersecting(ray))
+        val t = findIntersection(ray)
+
+        if (t === null)
             return Miss.instance
+
+        return Hit(
+            tmin = t,
+            localHitPoint = ray.origin + ray.direction*t,
+            normalAtHitPoint = computeNormalAtPoint(ray.origin + ray.direction*t))
+    }
+
+    override fun shadowHit(shadowRay: Ray): Double? {
+        val t = findIntersection(shadowRay)
+        return t
+    }
+
+    private fun findIntersection(ray: Ray): Double? {
+        if (!boundingBox.isIntersecting(ray))
+            return null
 
         // @mc: I added -position.xyz
         val x1 = ray.origin.x - position.x
@@ -59,17 +76,17 @@ class Torus(
         val four_a_sqrd	= 4.0 * ringRadius*ringRadius
 
         val coeffs = listOf(
-            e * e - four_a_sqrd * (tubeRadius*tubeRadius - y1 * y1),
-            4.0 * f * e + 2.0 * four_a_sqrd * y1 * d2,
-            2.0 * sum_d_sqrd * e + 4.0 * f * f + four_a_sqrd * d2 * d2,
-            4.0 * sum_d_sqrd * f,
-            sum_d_sqrd * sum_d_sqrd)
+                e * e - four_a_sqrd * (tubeRadius*tubeRadius - y1 * y1),
+                4.0 * f * e + 2.0 * four_a_sqrd * y1 * d2,
+                2.0 * sum_d_sqrd * e + 4.0 * f * f + four_a_sqrd * d2 * d2,
+                4.0 * sum_d_sqrd * f,
+                sum_d_sqrd * sum_d_sqrd)
 
         val solution = EquationSolver.solveX4(coeffs)
 
         // ray misses the torus
         if (solution.isEmpty())
-            return Miss.instance
+            return null
 
         // find the smallest root greater than kEpsilon, if any
         // the roots array is not sorted
@@ -77,12 +94,6 @@ class Torus(
                 .filter { it > K_EPSILON }
                 .min()
 
-        if (t == null)
-            return Miss.instance
-
-        return Hit(
-            tmin = t,
-            localHitPoint = ray.origin + ray.direction*t,
-            normalAtHitPoint = computeNormalAtPoint(ray.origin + ray.direction*t))
+        return t
     }
 }

@@ -103,43 +103,50 @@ class RayTracer {
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-        // floor.material = MatteMaterial(RgbColor.white)
+        floor.material = PhongMaterial(RgbColor.white)
 
 
-        GlobalRandom.setSeed(12349)
+        GlobalRandom.setSeed(123489)
 
 
         val size = 500
 
-        for (i in 1..5) {
+        for (i in 1..2) {
             val location = GlobalRandom.nextPoint(-size,size, 200,250, -size,size)
             val lookAt = GlobalRandom.nextPoint(-size,size, 0,-3000, -size,size)
 
             val color = RgbColor.randomColor()
 
-            world.addObject(Sphere(location, 1.0).apply {
-                material = StaticColorMaterial(color)
+            world.addObject(Sphere(location, 10.0).apply {
+                material = StaticColorMaterial(color).apply {
+                    castsShadows = false
+                }
             })
             world.addLight(PointLight(location, color))
 
         }
 
-        world.addLight(DirectionalLight(-Vector3D.axisY, RgbColor.red))
+        // world.addLight(DirectionalLight(-Vector3D.axisY, RgbColor.red))
 
         for (i in 1..15) {
-            val location = GlobalRandom.nextPoint(-size,size, 13,13, -size,size)
+            val location = GlobalRandom.nextPoint(-size,size, 23,23, -size,size)
 
-            world.addObject(Sphere(location, 13.0).apply {
+            world.addObject(Sphere(location, 23.0).apply {
                 material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 40.0)
             })
         }
 
+        /*
         val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
 
             material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
         }
-        world.addObject(torus)
-        world.addObject(floor)
+        world.addObject(torus)*/
+        world.addObject(floor)/*
+
+        world.addObject(OpenCylinder(1.0, 120.0, 50.0).apply {
+            material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
+        })*/
 
     }
 

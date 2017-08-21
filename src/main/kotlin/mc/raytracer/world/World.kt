@@ -1,28 +1,18 @@
 package mc.raytracer.world
 
-import jdk.nashorn.internal.runtime.regexp.joni.Regex
-import mc.raytracer.antialiasing.JitteredAntialiasingStrategy
-import mc.raytracer.antialiasing.RandomAntialiasingStrategy
-import mc.raytracer.antialiasing.RegularAntialiasingStrategy
-import mc.raytracer.cameras.BaseCamera
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Hit
-import mc.raytracer.geometry.Sphere
 import mc.raytracer.lighting.AmbientLight
 import mc.raytracer.lighting.Light
-import mc.raytracer.material.Material
+import mc.raytracer.lighting.LightWithShadowSupport
 import mc.raytracer.material.NullMaterial
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.math.Vector3D
 import mc.raytracer.tracers.Tracer
-import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
-import java.util.stream.IntStream
-import java.util.stream.Stream
-import java.util.stream.StreamSupport
 
 class World(
         val viewPlane: ViewPlane,
@@ -35,17 +25,14 @@ class World(
 
     val objects: ArrayList<GeometricObject> = ArrayList()
 
-    val lights = mutableListOf<Light>()
+    val lights = mutableListOf<LightWithShadowSupport>()
     var ambientLight = AmbientLight(color=RgbColor.white)
 
     fun addObject(obj: GeometricObject) {
         objects.add(obj)
     }
 
-    fun addLight(light: Light) {
-        if (light is AmbientLight)
-            throw IllegalArgumentException("Use world ambientLight property to set ambient light.")
-
+    fun addLight(light: LightWithShadowSupport) {
         lights.add(light)
     }
 
@@ -87,5 +74,18 @@ class World(
                 ray = ray,
                 recursionDepth = depth,
                 world = this)
+    }
+
+    public fun existsObjectInDirection(shadowRay: Ray, maxDistance: Double): Boolean {
+        for (obj in objects) {
+            if (!obj.material.castsShadows) continue
+
+            val t = obj.shadowHit(shadowRay)
+            if ((t !== null) && (t <= maxDistance)) {
+                return true
+            }
+        }
+
+        return false
     }
 }
