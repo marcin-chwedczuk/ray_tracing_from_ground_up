@@ -1,6 +1,7 @@
 package mc.raytracer.cameras
 
 import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
+import mc.raytracer.math.Angle
 import mc.raytracer.math.Matrix4
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Vector3D
@@ -101,17 +102,17 @@ abstract class BaseCamera {
 
         if (Math.abs(rollAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(w, rollAngleInDegrees)
+                    Matrix4.rotationMatrix(w, Angle.fromDegrees(rollAngleInDegrees))
         }
 
         if (Math.abs(yawAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(v, yawAngleInDegrees)
+                    Matrix4.rotationMatrix(v, Angle.fromDegrees(yawAngleInDegrees))
         }
 
         if (Math.abs(pitchAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(u, pitchAngleInDegrees)
+                    Matrix4.rotationMatrix(u, Angle.fromDegrees(pitchAngleInDegrees))
         }
 
         w = (rotationMatrix*w).norm()

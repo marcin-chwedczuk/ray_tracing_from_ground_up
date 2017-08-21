@@ -73,15 +73,15 @@ class Matrix4 {
             0.0, 0.0, 0.0, 0.0
         ))
 
-        fun rotationMatrix(axis: Vector3D, angleInDegrees: Double): Matrix4 {
+        fun rotationMatrix(axis: Vector3D, angle: Angle): Matrix4 {
             // derived using formula: https://en.wikipedia.org/wiki/Rotation_matrix
 
             // @formatter:off
-            val angle = angleInDegrees.degToRad()
+            val angleRadians = angle.toRadians()
             val u = axis.norm()
             val x = u.x; val y = u.y; val z = u.z
 
-            val sin = Math.sin(angle); val cos = Math.cos(angle)
+            val sin = Math.sin(angleRadians); val cos = Math.cos(angleRadians)
 
             return Matrix4(arrayOf(
                 x*x*(1-cos)+cos,   x*y*(1-cos)-z*sin, x*z*(1-cos)+y*sin, 0.0,

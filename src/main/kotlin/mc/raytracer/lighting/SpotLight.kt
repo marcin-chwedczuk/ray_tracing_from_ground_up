@@ -2,6 +2,7 @@ package mc.raytracer.lighting
 
 import mc.raytracer.math.Angle
 import mc.raytracer.math.Point3D
+import mc.raytracer.math.Ray
 import mc.raytracer.math.Vector3D
 import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
@@ -13,7 +14,10 @@ public class SpotLight(
         val color: RgbColor,
         val radianceScalingFactor: Double = 1.0,
         val cutOffExponent: Double = 500.0
-): Light {
+): LightWithShadowSupport {
+
+    override var castsShadows: Boolean = true
+
     private val reversedNormalizedLookAt = -lookAt.norm()
 
     private val innerCutOffCos = innerCutOff.cos()
@@ -39,4 +43,8 @@ public class SpotLight(
         return color * radianceScalingFactor * Math.pow(tmp, cutOffExponent)
     }
 
+    override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
+        val maxDistance = shadowRay.origin.distanceTo(location)
+        return shadingInfo.world.existsObjectInDirection(shadowRay, maxDistance)
+    }
 }
