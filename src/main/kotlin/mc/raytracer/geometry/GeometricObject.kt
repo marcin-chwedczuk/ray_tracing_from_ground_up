@@ -2,6 +2,7 @@ package mc.raytracer.geometry
 
 import mc.raytracer.material.Material
 import mc.raytracer.material.StaticColorMaterial
+import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.util.RgbColor
 

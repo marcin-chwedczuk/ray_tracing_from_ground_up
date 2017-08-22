@@ -76,8 +76,8 @@ class World(
                 world = this)
     }
 
-    public fun existsObjectInDirection(shadowRay: Ray,
-                                       maxDistance: Double = Double.MAX_VALUE): Boolean {
+    public fun existsCastingShadowObjectInDirection(shadowRay: Ray,
+                                                    maxDistance: Double = Double.MAX_VALUE): Boolean {
         for (obj in objects) {
             if (!obj.material.castsShadows) continue
 

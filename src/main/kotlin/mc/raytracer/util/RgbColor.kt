@@ -51,6 +51,9 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
     operator fun times(value: Double)
         = RgbColor(r*value, g*value, b*value)
 
+    operator fun times(other: RgbColor)
+        = RgbColor(r*other.r, g*other.g, b*other.b)
+
     operator fun div(value: Double)
         = RgbColor(r/value, g/value, b/value)
 
@@ -62,6 +65,7 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         val yellow = RgbColor(1.0,1.0,0.0)
         val green = RgbColor(0.0, 1.0, 0.0)
         val blue = RgbColor(0.0, 0.0, 1.0)
+        val pink = RgbColor(255,105,180)
 
         fun grayscale(value: Double): RgbColor {
             val clamped = value.clamp(0.0, 1.0)

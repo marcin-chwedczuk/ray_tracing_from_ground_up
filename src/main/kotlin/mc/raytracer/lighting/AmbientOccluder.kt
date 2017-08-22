@@ -33,13 +33,15 @@ public class AmbientOccluder(
 
         // see: http://www.rorydriscoll.com/2009/01/07/better-sampling/
 
-        val SAMPLE_NO = 64
+        // number of samples may be set on view plane or here
+        // we may boost it a little
+        val SAMPLE_NO = 1 // 64
         for (sampleNo in 1..SAMPLE_NO) {
             val sample = sampler.nextVectorOnUnitHemispehere()
             val rayDirection = (v * sample.x + w * sample.y + u * sample.z).norm()
             val shadowRay = Ray(shadingInfo.hitPoint, rayDirection)
 
-            if (shadingInfo.world.existsObjectInDirection(shadowRay)) {
+            if (shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay)) {
                 L += radianceScalingFactor * minRadience
             } else {
                 L += radianceScalingFactor

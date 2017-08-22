@@ -18,8 +18,7 @@ public class MatteMaterial(
         val world = info.world
 
         val wo = -info.ray.direction
-        var L = world.ambientLight.computeLuminanceContributedByLight(info)
-                .multiplyComponentwise(ambientBrdf.rho(info, wo))
+        var L = world.ambientLight.computeLuminanceContributedByLight(info) * ambientBrdf.rho(info, wo)
 
         for(light in world.lights) {
             val wi = light.computeDirectionFromHitPointToLight(info)
@@ -34,12 +33,45 @@ public class MatteMaterial(
                 }
 
                 if (!hitPointInShadow) {
-                    L += diffuseBrdf.evaluate(info, wo, wi).multiplyComponentwise(
-                            light.computeLuminanceContributedByLight(info)) * ndotwi
+                    L += light.computeLuminanceContributedByLight(info) *
+                            diffuseBrdf.evaluate(info, wo, wi) * ndotwi
                 }
             }
         }
 
         return L
     }
+
+    override fun areaLightShade(info: ShadingInfo): RgbColor {
+        val world = info.world
+
+        val wo = -info.ray.direction
+        var L = world.ambientLight.computeLuminanceContributedByLight(info) * ambientBrdf.rho(info, wo)
+
+        for(light in world.lights) {
+            val wi = light.computeDirectionFromHitPointToLight(info)
+            val ndotwi = info.normalAtHitPoint.dot(wi)
+
+            if (ndotwi > 0.0) {
+                var hitPointInShadow = false
+
+                if (light.castsShadows) {
+                    val shadowRay = Ray(info.hitPoint, wi)
+                    hitPointInShadow = light.isHitPointInShadow(info, shadowRay)
+                }
+
+                if (!hitPointInShadow) {
+                    val dL = light.computeLuminanceContributedByLight(info) *
+                            diffuseBrdf.evaluate(info, wo, wi) *
+                            ndotwi *
+                            light.geometricFactor(info) /
+                            light.monteCarloPdf(info)
+                    L += dL
+                }
+            }
+        }
+
+        return L
+    }
+
 }

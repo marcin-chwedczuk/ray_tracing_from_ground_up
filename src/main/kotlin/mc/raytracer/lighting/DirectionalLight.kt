@@ -25,6 +25,6 @@ public class DirectionalLight(
     }
 
     override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
-        return shadingInfo.world.existsObjectInDirection(shadowRay, maxDistance=Double.MAX_VALUE)
+        return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance=Double.MAX_VALUE)
     }
 }

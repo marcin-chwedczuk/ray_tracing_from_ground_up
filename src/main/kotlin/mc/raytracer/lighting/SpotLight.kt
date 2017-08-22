@@ -45,6 +45,6 @@ public class SpotLight(
 
     override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
         val maxDistance = shadowRay.origin.distanceTo(location)
-        return shadingInfo.world.existsObjectInDirection(shadowRay, maxDistance)
+        return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance)
     }
 }
