@@ -13,7 +13,6 @@ public class DirectionalLight(
 
     override val castsShadows: Boolean = true
 
-    private val direction = direction.norm()
     private val reversedDirection = -direction.norm()
 
     override fun computeDirectionFromHitPointToLight(shadingInfo: ShadingInfo): Vector3D {

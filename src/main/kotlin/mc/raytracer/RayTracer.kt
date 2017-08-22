@@ -114,14 +114,14 @@ class RayTracer {
 
         enableAmbientOcclusion(false)
 
-        // world.addLight(DirectionalLight(-Vector3D.axisZ, RgbColor.white, radianceScalingFactor = 1.0))
+        world.addLight(DirectionalLight(Vector3D(0,-1,-1), RgbColor.white, radianceScalingFactor = 1.0))
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-        floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
+        // floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
 
 
-        GlobalRandom.setSeed(123489)
+        GlobalRandom.setSeed(12348)
 
 
         val size = 500
@@ -139,11 +139,16 @@ class RayTracer {
         world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 2.3))
         */
 
+        val envLight = EnvironmentLight(
+                EmissiveMaterial(RgbColor.white, radianceScalingFactor = 0.3),
+                HemisphereSampler.fromSquareSampler(MultiJitteredSampler(256)))
+       //  world.addLight(envLight)
+
         val obj = Rectangle2D(Point3D(0,220,0), Vector3D.axisX*100.0, Vector3D.axisZ*300.0, MultiJitteredSampler(256)).apply {
             material = EmissiveMaterial(RgbColor.white, radianceScalingFactor = 10.0)
         }
-        world.addLight(AreaLight(obj))
-        world.addObject(obj)
+        // world.addLight(AreaLight(obj))
+        // world.addObject(obj)
 
         /*
         for (i in 1..8) {
@@ -171,23 +176,19 @@ class RayTracer {
             })
         }
 
-
-
-
-        /*val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
-
+        val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
             material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
         }
-        world.addObject(torus)*/
+        world.addObject(torus)
 
-        val openCylinder = OpenCylinder(-3.0, 30.0, 30.0).apply {
+        /*val openCylinder = OpenCylinder(-3.0, 30.0, 30.0).apply {
             material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
         }
         world.addObject(openCylinder)
 
         world.addObject(Sphere(Point3D(0,60,0), 30.0).apply {
             material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3)
-        })
+        })*/
 
         world.addObject(floor)/*
 

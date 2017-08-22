@@ -9,10 +9,10 @@ public interface LightWithShadowSupport : Light {
     fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean
 
     fun geometricFactor(info: ShadingInfo): Double {
-        TODO("Not impl")
+        return 1.0
     }
 
     fun monteCarloPdf(info: ShadingInfo): Double {
-        TODO("not implemented")
+        return 1.0
     }
 }
