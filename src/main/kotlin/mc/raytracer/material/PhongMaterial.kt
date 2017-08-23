@@ -44,7 +44,8 @@ public class PhongMaterial(
                             diffuseBrdf.evaluate(info, wo, wi) +
                             specularBrdf.evaluate(info, wo, wi)
 
-                    L = L + brdf * lightningAttributes.radiance() * ndotwi
+                    val dL = brdf * lightningAttributes.radiance() * ndotwi
+                    L += dL
                 }
             }
         }

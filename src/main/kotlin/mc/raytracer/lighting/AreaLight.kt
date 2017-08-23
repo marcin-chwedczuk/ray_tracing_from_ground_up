@@ -3,8 +3,6 @@ package mc.raytracer.lighting
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.SupportsSurfaceSampling
 import mc.raytracer.material.EmissiveMaterial
-import mc.raytracer.math.Normal3D
-import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.math.Vector3D
 import mc.raytracer.util.RgbColor
@@ -20,8 +18,8 @@ public class AreaLight<out T>(val geometricObject: T)
     public override var generatesShadows: Boolean = true
 
     override fun computeHitPointLightingAttributes(shadingInfo: ShadingInfo): HitPointLightingAttributes {
-        val samplePoint = geometricObject.samplePoint()
-        val normalAtSamplePoint = geometricObject.getNormalAtPoint(samplePoint)
+        val samplePoint = geometricObject.selectSamplePoint()
+        val normalAtSamplePoint = geometricObject.normalAtSamplePoint(samplePoint)
         val wi = (samplePoint - shadingInfo.hitPoint).norm()
 
         return object : HitPointLightingAttributes {
@@ -51,7 +49,7 @@ public class AreaLight<out T>(val geometricObject: T)
             }
 
             override fun samplePointPdf(): Double {
-                return geometricObject.getPdfOfSample(samplePoint)
+                return geometricObject.pdfOfSamplePoint(samplePoint)
             }
         }
     }

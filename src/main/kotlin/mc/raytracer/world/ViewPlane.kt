@@ -63,7 +63,7 @@ class ViewPlane(
     fun displayPixel(canvas: RawBitmap, vpRow: Int, vpCol: Int, color: RgbColor) {
         var colorToDisplay =
                 if (showOutOfGamutErrors)
-                    color.orWhenOutOfRange(RgbColor.red)
+                    color.orWhenOutOfRange(RgbColor.pink)
                 else
                     color.scaleMaxToOne()
 

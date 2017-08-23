@@ -3,9 +3,10 @@ package mc.raytracer
 import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
-import mc.raytracer.geometry.Rectangle2D
+import mc.raytracer.geometry.primitives.d2.Rectangle
 import mc.raytracer.geometry.Sphere
 import mc.raytracer.geometry.primitives.Torus
+import mc.raytracer.geometry.primitives.d2.Disc
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
@@ -13,6 +14,7 @@ import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.threading.CancelFlag
 import mc.raytracer.tracers.AreaLightingTracer
+import mc.raytracer.tracers.RayCasterTracer
 import mc.raytracer.util.GlobalRandom
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
@@ -31,10 +33,10 @@ class RayTracer {
 
     init {
         viewPlane = ViewPlane(400, 320, pixelSize = 2.0)
-        viewPlane.configureNumberOfSamplesPerPixel(64)
-        // viewPlane.showOutOfGamutErrors = true
+        viewPlane.configureNumberOfSamplesPerPixel(4)
+        viewPlane.showOutOfGamutErrors = true
 
-        val tracer = AreaLightingTracer() //  RayCasterTracer()
+        val tracer = RayCasterTracer() // AreaLightingTracer() //  RayCasterTracer()
 
         //val tmp = ThinLensCamera(CircleSampler.fromSquareSampler(MultiJitteredSampler(numberOfSamples = 36)))
         camera = PinholeCamera()
@@ -123,34 +125,33 @@ class RayTracer {
         val size = 500
 
 
-
         val rot4 = Matrix4.rotationMatrix(Vector3D.axisY, Angle.fromDegrees(120))
         val vec = Vector3D(-1.0,-0.3,0.0)*200.0
         val vec2 = rot4 * vec
         val vec3 = rot4 * vec2
 
+
+        world.addLight(SpotLight(Point3D.zero - vec, vec, Angle.fromDegrees(50), RgbColor.red,radianceScalingFactor = 1.0))
+        //world.addLight(SpotLight(Point3D.zero - vec2, vec2, Angle.fromDegrees(50), RgbColor.green,radianceScalingFactor = 1.0))
+        //world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 1.0))
+
+
+        //world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.orange,radianceScalingFactor = 2.3))
+
+
         /*
-        world.addLight(SpotLight(Point3D.zero - vec, vec, Angle.fromDegrees(50), RgbColor.red,radianceScalingFactor = 2.3))
-        world.addLight(SpotLight(Point3D.zero - vec2, vec2, Angle.fromDegrees(50), RgbColor.green,radianceScalingFactor = 2.3))
-        world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 2.3))
-        */
-
-        val envLight = EnvironmentLight(
-                EmissiveMaterial(RgbColor.white, radianceScalingFactor = 0.3),
-                HemisphereSampler.fromSquareSampler(MultiJitteredSampler(256)))
-       //  world.addLight(envLight)
-
-        val obj = Rectangle2D(Point3D(0,250,0), Vector3D.axisX*150.0, Vector3D.axisZ*150.0, MultiJitteredSampler(256)).apply {
+        val obj = Rectangle(Point3D(0,250,0), Vector3D.axisX*150.0, Vector3D.axisZ*150.0, MultiJitteredSampler(256)).apply {
             material = EmissiveMaterial(RgbColor.yellow, radianceScalingFactor = 5.0)
         }
         world.addLight(AreaLight(obj))
         world.addObject(obj)
 
-        val obj2 = Rectangle2D(Point3D(0,250,-300), Vector3D.axisX*150.0, Vector3D.axisZ*150.0, MultiJitteredSampler(256)).apply {
+        val obj2 = Rectangle(Point3D(0,250,-300), Vector3D.axisX*150.0, Vector3D.axisZ*150.0, MultiJitteredSampler(256)).apply {
             material = EmissiveMaterial(RgbColor.red, radianceScalingFactor = 5.0)
         }
         world.addLight(AreaLight(obj2))
         world.addObject(obj2)
+        */
 
         /*
         for (i in 1..8) {
@@ -178,10 +179,15 @@ class RayTracer {
             })
         }
 
+        world.addObject(Disc(Point3D(30,40,-100), Normal3D.fromVector(vec3), 30.0).apply {
+            material = PhongMaterial(RgbColor.white)
+        })
+
+        /*
         val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
             material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
         }
-        world.addObject(torus)
+        world.addObject(torus) */
 
         /*val openCylinder = OpenCylinder(-3.0, 30.0, 30.0).apply {
             material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)

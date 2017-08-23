@@ -29,6 +29,11 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         return this
     }
 
+    fun isOutOfRange(): Boolean {
+        val max = Math.max(r, Math.max(g, b))
+        return (max > 1.0)
+    }
+
     fun orWhenOutOfRange(color: RgbColor): RgbColor {
         val max = Math.max(r, Math.max(g, b))
         return if (max > 1.0f) color else this

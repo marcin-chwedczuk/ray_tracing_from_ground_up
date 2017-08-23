@@ -13,7 +13,7 @@ public class GlossySpecularBRDF(
     override fun evaluate(shadingInfo: ShadingInfo, incomingLight: Vector3D, outgoingLight: Vector3D): RgbColor {
         val incomingDotNormal = incomingLight dot shadingInfo.normalAtHitPoint
         val reflectedIncomingLightVector =
-                (-incomingLight + shadingInfo.normalAtHitPoint * incomingDotNormal * 2.0)
+                (-incomingLight + shadingInfo.normalAtHitPoint * incomingDotNormal * 2.0) // .norm()
 
         val rDotOutgoing = reflectedIncomingLightVector dot outgoingLight
 

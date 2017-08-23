@@ -1,5 +1,6 @@
 package mc.raytracer.geometry
 
+import mc.raytracer.geometry.primitives.d2.Rectangle
 import mc.raytracer.material.Material
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
@@ -12,7 +13,7 @@ class Cuboid(
         val depth: Double = 40.0)
     : GeometricObject() {
 
-    private val walls: ArrayList<Rectangle2D> = ArrayList()
+    private val walls: ArrayList<Rectangle> = ArrayList()
 
     override var material: Material
         get() = super.material
@@ -32,16 +33,16 @@ class Cuboid(
         val d2 = depth / 2
 
         // length x depth
-        val top = Rectangle2D(center+ Vector3D(-l2,h2,-d2),z,x)
-        val bottom = Rectangle2D(center+ Vector3D(-l2,-h2,-d2),z,x)
+        val top = Rectangle(center+ Vector3D(-l2,h2,-d2),z,x)
+        val bottom = Rectangle(center+ Vector3D(-l2,-h2,-d2),z,x)
 
         // length x height
-        val front = Rectangle2D(center+ Vector3D(-l2,-h2,d2),x,y)
-        val back = Rectangle2D(center+ Vector3D(-l2,-h2,-d2),x,y)
+        val front = Rectangle(center+ Vector3D(-l2,-h2,d2),x,y)
+        val back = Rectangle(center+ Vector3D(-l2,-h2,-d2),x,y)
 
         // depth x height
-        val left = Rectangle2D(center+ Vector3D(-l2,-h2,-d2),z,y)
-        val right = Rectangle2D(center+Vector3D(l2,-h2,-d2),z,y)
+        val left = Rectangle(center+ Vector3D(-l2,-h2,-d2),z,y)
+        val right = Rectangle(center+Vector3D(l2,-h2,-d2),z,y)
 
         walls.addAll(sequenceOf(top,bottom,front,back,left,right))
     }

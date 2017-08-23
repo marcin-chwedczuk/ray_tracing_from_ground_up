@@ -21,7 +21,7 @@ class Normal3DTest {
     fun normWorks() {
         val a = Normal3D(3, 1, 2)
 
-        val norm = a.norm()
+        val norm = a
 
         assertEquals(0.80178372, norm.x, message = "component x")
         assertEquals(0.26726124, norm.y, message = "component y")

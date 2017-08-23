@@ -1,17 +1,14 @@
-package mc.raytracer.geometry
+package mc.raytracer.geometry.primitives.d2
 
+import mc.raytracer.geometry.*
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.math.*
-import mc.raytracer.util.BoundingBox
-import java.lang.Math.max
-import java.lang.Math.min
 import mc.raytracer.math.Vector3D
 import mc.raytracer.sampling.JitteredSampler
 import mc.raytracer.sampling.SquareSampler
-import mc.raytracer.util.ShadingInfo
 
-class Rectangle2D(
+class Rectangle(
         val point: Point3D,
         val spanA: Vector3D,
         val spanB: Vector3D,
@@ -19,8 +16,8 @@ class Rectangle2D(
     : GeometricObject(), SupportsSurfaceSampling {
 
     private val normal = Normal3D.fromVector(spanA cross spanB)
-    private val sampler = sampler ?: JitteredSampler()
     private val invertedArea = 1.0 / (spanA cross spanB).length
+    private val sampler by lazy { sampler ?: JitteredSampler() }
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -62,17 +59,17 @@ class Rectangle2D(
         return t
     }
 
-    override fun samplePoint(): Point3D {
+    override fun selectSamplePoint(): Point3D {
         val sample = sampler.nextSampleOnUnitSquare()
         val point = point + spanA*sample.x + spanB*sample.y
         return point
     }
 
-    override fun getPdfOfSample(point: Point3D): Double {
+    override fun pdfOfSamplePoint(point: Point3D): Double {
         return invertedArea
     }
 
-    override fun getNormalAtPoint(point: Point3D): Normal3D {
+    override fun normalAtSamplePoint(point: Point3D): Normal3D {
         return normal
     }
 }

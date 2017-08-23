@@ -36,7 +36,7 @@ class Torus(
             4.0 * y * (sumSquared - paramSquared + 2.0*ringRadius*ringRadius),
             4.0 * z * (sumSquared - paramSquared))
 
-        return normal.norm()
+        return normal
     }
 
     override fun hit(ray: Ray): HitResult {
