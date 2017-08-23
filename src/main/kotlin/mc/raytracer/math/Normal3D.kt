@@ -27,6 +27,15 @@ class Normal3D(x: Double, y: Double, z: Double) {
     infix fun dot(other: Vector3D)
         = x*other.x + y*other.y + z*other.z
 
+    infix fun cross(other: Vector3D)
+            = Vector3D(
+            y*other.z - z*other.y,
+            z*other.x - x*other.z,
+            x*other.y - y*other.x)
+
+    infix fun cross(other: Normal3D)
+            = this cross Vector3D(other)
+
     override fun toString()
         = "normal3(%.3f, %.3f, %.3f)".format(x,y,z)
 

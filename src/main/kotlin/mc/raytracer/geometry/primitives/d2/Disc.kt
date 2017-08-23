@@ -1,16 +1,28 @@
 package mc.raytracer.geometry.primitives.d2
 
-import mc.raytracer.geometry.GeometricObject
-import mc.raytracer.geometry.Hit
-import mc.raytracer.geometry.HitResult
-import mc.raytracer.geometry.Miss
+import mc.raytracer.geometry.*
 import mc.raytracer.math.*
+import mc.raytracer.sampling.CircleSampler
+import mc.raytracer.sampling.JitteredSampler
+import mc.raytracer.util.LocalCoordinateSystem
 
 public class Disc(
         val center: Point3D,
         val normal: Normal3D,
-        val radius: Double
-): GeometricObject() {
+        val radius: Double,
+        sampler: CircleSampler?
+): GeometricObject(), SupportsSurfaceSampling {
+
+    private val sampler by lazy {
+        sampler ?: CircleSampler.fromSquareSampler(JitteredSampler())
+    }
+
+    private val localCoordinateSystem by lazy {
+        LocalCoordinateSystem.fromNormal(normal)
+    }
+
+    private val area = PI * radius * radius
+    private val invertedArea = 1.0 / area
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -19,12 +31,13 @@ public class Disc(
             return Miss.instance
 
         // reverse normal if we are looking at the disk from the other side
-        val n = if (-ray.direction dot normal > 0.0) normal else -normal
+        // val n = if (-ray.direction dot normal > 0.0) normal else -normal
+        // don't revers when used as area light
 
         return Hit(
                 tmin = t,
                 localHitPoint = ray.origin + t*ray.direction,
-                normalAtHitPoint = n)
+                normalAtHitPoint = normal)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {
@@ -43,6 +56,24 @@ public class Disc(
             return null
 
         return t
+    }
+
+    override fun selectSamplePoint(): Point3D {
+        val point2D = sampler.nextSampleOnUnitDisk()
+
+        val pointOnDisk = center +
+                localCoordinateSystem.u * point2D.x +
+                localCoordinateSystem.v * point2D.y
+
+        return pointOnDisk
+    }
+
+    override fun pdfOfSamplePoint(point: Point3D): Double {
+        return invertedArea
+    }
+
+    override fun normalAtSamplePoint(point: Point3D): Normal3D {
+        return normal
     }
 }
 

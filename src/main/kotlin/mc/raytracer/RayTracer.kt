@@ -10,6 +10,7 @@ import mc.raytracer.geometry.primitives.d2.Disc
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
+import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.MultiJitteredSampler
 import mc.raytracer.threading.CancelFlag
@@ -34,9 +35,9 @@ class RayTracer {
     init {
         viewPlane = ViewPlane(400, 320, pixelSize = 2.0)
         viewPlane.configureNumberOfSamplesPerPixel(4)
-        viewPlane.showOutOfGamutErrors = true
+        //viewPlane.showOutOfGamutErrors = true
 
-        val tracer = RayCasterTracer() // AreaLightingTracer() //  RayCasterTracer()
+        val tracer = AreaLightingTracer() //  RayCasterTracer()
 
         //val tmp = ThinLensCamera(CircleSampler.fromSquareSampler(MultiJitteredSampler(numberOfSamples = 36)))
         camera = PinholeCamera()
@@ -130,11 +131,11 @@ class RayTracer {
         val vec2 = rot4 * vec
         val vec3 = rot4 * vec2
 
-
+/*
         world.addLight(SpotLight(Point3D.zero - vec, vec, Angle.fromDegrees(50), RgbColor.red,radianceScalingFactor = 1.0))
-        //world.addLight(SpotLight(Point3D.zero - vec2, vec2, Angle.fromDegrees(50), RgbColor.green,radianceScalingFactor = 1.0))
-        //world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 1.0))
-
+        world.addLight(SpotLight(Point3D.zero - vec2, vec2, Angle.fromDegrees(50), RgbColor.green,radianceScalingFactor = 2.0))
+        world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.blue,radianceScalingFactor = 1.0))
+*/
 
         //world.addLight(SpotLight(Point3D.zero - vec3, vec3, Angle.fromDegrees(50), RgbColor.orange,radianceScalingFactor = 2.3))
 
@@ -179,9 +180,17 @@ class RayTracer {
             })
         }
 
-        world.addObject(Disc(Point3D(30,40,-100), Normal3D.fromVector(vec3), 30.0).apply {
-            material = PhongMaterial(RgbColor.white)
-        })
+
+
+        val disc = Disc(
+                Point3D(30,242,-100),
+                -Normal3D.axisY,
+                160.0,
+                CircleSampler.fromSquareSampler(MultiJitteredSampler(256))).apply {
+            material = EmissiveMaterial(RgbColor.white)
+        }
+        world.addObject(disc)
+        world.addLight(AreaLight(disc))
 
         /*
         val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {
