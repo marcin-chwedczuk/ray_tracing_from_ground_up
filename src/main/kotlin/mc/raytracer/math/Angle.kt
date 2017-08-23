@@ -14,7 +14,7 @@ class Angle {
         = angleInRadians
 
     override fun toString()
-        = "(innerCutOff ${toDegrees()}\u00B0)"
+        = "(beamAngle ${toDegrees()}\u00B0)"
 
     fun tan(): Double
             = Math.tan(angleInRadians)

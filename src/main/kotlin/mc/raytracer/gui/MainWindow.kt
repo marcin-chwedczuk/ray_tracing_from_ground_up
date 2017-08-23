@@ -3,7 +3,7 @@ package mc.raytracer.gui
 import mc.raytracer.RayTracer
 import mc.raytracer.RayTracingThread
 import mc.raytracer.cameras.BaseCamera
-import mc.raytracer.lighting.AmbientOccluder
+import mc.raytracer.lighting.AmbientOccluderAmbientLight
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.Resolution
 import mc.raytracer.util.RgbColor
@@ -232,7 +232,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
             }
 
             KeyEvent.VK_L -> {
-                if (rayTracer.world.ambientLight is AmbientOccluder) {
+                if (rayTracer.world.ambientLight is AmbientOccluderAmbientLight) {
                     rayTracer.enableAmbientOcclusion(false)
                 }
                 else {

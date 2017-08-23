@@ -18,23 +18,24 @@ public class MatteMaterial(
         val world = info.world
 
         val wo = -info.ray.direction
-        var L = world.ambientLight.computeLuminanceContributedByLight(info) * ambientBrdf.rho(info, wo)
+        var L = world.ambientLight.radiance(info) * ambientBrdf.rho(info, wo)
 
         for(light in world.lights) {
-            val wi = light.computeDirectionFromHitPointToLight(info)
+            val lightningAttributes = light.computeHitPointLightingAttributes(info)
+
+            val wi = lightningAttributes.toLightDirection
             val ndotwi = info.normalAtHitPoint.dot(wi)
 
             if (ndotwi > 0.0) {
                 var hitPointInShadow = false
 
-                if (light.castsShadows) {
+                if (light.generatesShadows) {
                     val shadowRay = Ray(info.hitPoint, wi)
-                    hitPointInShadow = light.isHitPointInShadow(info, shadowRay)
+                    hitPointInShadow = lightningAttributes.isHitPointInShadow(shadowRay)
                 }
 
                 if (!hitPointInShadow) {
-                    L += light.computeLuminanceContributedByLight(info) *
-                            diffuseBrdf.evaluate(info, wo, wi) * ndotwi
+                    L = L + (lightningAttributes.radiance() * diffuseBrdf.evaluate(info, wo, wi) * ndotwi)
                 }
             }
         }
@@ -46,27 +47,29 @@ public class MatteMaterial(
         val world = info.world
 
         val wo = -info.ray.direction
-        var L = world.ambientLight.computeLuminanceContributedByLight(info) * ambientBrdf.rho(info, wo)
+        var L = world.ambientLight.radiance(info) * ambientBrdf.rho(info, wo)
 
         for(light in world.lights) {
-            val wi = light.computeDirectionFromHitPointToLight(info)
+            val lightningAttributes = light.computeHitPointLightingAttributes(info)
+
+            val wi = lightningAttributes.toLightDirection
             val ndotwi = info.normalAtHitPoint.dot(wi)
 
             if (ndotwi > 0.0) {
                 var hitPointInShadow = false
 
-                if (light.castsShadows) {
+                if (light.generatesShadows) {
                     val shadowRay = Ray(info.hitPoint, wi)
-                    hitPointInShadow = light.isHitPointInShadow(info, shadowRay)
+                    hitPointInShadow = lightningAttributes.isHitPointInShadow(shadowRay)
                 }
 
                 if (!hitPointInShadow) {
-                    val dL = light.computeLuminanceContributedByLight(info) *
+                    val dL = lightningAttributes.radiance() *
                             diffuseBrdf.evaluate(info, wo, wi) *
                             ndotwi *
-                            light.geometricFactor(info) /
-                            light.monteCarloPdf(info)
-                    L += dL
+                            lightningAttributes.samplePointGeometricFactor() /
+                            lightningAttributes.samplePointPdf()
+                    L = L + dL
                 }
             }
         }

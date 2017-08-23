@@ -5,25 +5,32 @@ import mc.raytracer.math.Vector3D
 import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 
+/**
+ * @param directionOfRays Direction of rays from light source to object surfaces.
+ */
 public class DirectionalLight(
-        direction: Vector3D,
+        directionOfRays: Vector3D,
         val color: RgbColor = RgbColor.white,
         val radianceScalingFactor: Double = 1.0
-): LightWithShadowSupport {
+): Light {
 
-    override val castsShadows: Boolean = true
+    private val reversedDirection = -directionOfRays.norm()
+    public override val generatesShadows: Boolean = true
 
-    private val reversedDirection = -direction.norm()
+    override fun computeHitPointLightingAttributes(shadingInfo: ShadingInfo): HitPointLightingAttributes {
+        return object : HitPointLightingAttributes {
 
-    override fun computeDirectionFromHitPointToLight(shadingInfo: ShadingInfo): Vector3D {
-        return reversedDirection
-    }
+            override val toLightDirection: Vector3D
+                get() = reversedDirection
 
-    override fun computeLuminanceContributedByLight(shadingInfo: ShadingInfo): RgbColor {
-        return color*radianceScalingFactor
-    }
+            override fun isHitPointInShadow(shadowRay: Ray): Boolean {
+                return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance=Double.MAX_VALUE)
+            }
 
-    override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
-        return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance=Double.MAX_VALUE)
+            override fun radiance(): RgbColor {
+                return color*radianceScalingFactor
+            }
+
+        }
     }
 }

@@ -7,6 +7,7 @@ import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
 import mc.raytracer.util.RgbColor
 import mc.raytracer.world.World
+import java.util.stream.IntStream
 
 class PinholeCamera : BaseCamera() {
 
@@ -34,7 +35,7 @@ class PinholeCamera : BaseCamera() {
         //IntStream.range(0, vres).parallel()
         //        .forEach { r ->
         for (r in 0 until vres) {
-            if (cancelFlag.shouldCancel) return
+            if (cancelFlag.shouldCancel) return//@forEach
 
             for (c in 0 until hres) {
 

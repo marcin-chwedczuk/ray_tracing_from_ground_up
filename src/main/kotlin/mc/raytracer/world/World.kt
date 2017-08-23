@@ -3,8 +3,8 @@ package mc.raytracer.world
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Hit
 import mc.raytracer.lighting.AmbientLight
+import mc.raytracer.lighting.ConstantColorAmbientLight
 import mc.raytracer.lighting.Light
-import mc.raytracer.lighting.LightWithShadowSupport
 import mc.raytracer.material.NullMaterial
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
@@ -25,14 +25,14 @@ class World(
 
     val objects: ArrayList<GeometricObject> = ArrayList()
 
-    val lights = mutableListOf<LightWithShadowSupport>()
-    var ambientLight: Light = AmbientLight(color=RgbColor.white)
+    val lights = mutableListOf<Light>()
+    var ambientLight: AmbientLight = ConstantColorAmbientLight(color=RgbColor.white)
 
     fun addObject(obj: GeometricObject) {
         objects.add(obj)
     }
 
-    fun addLight(light: LightWithShadowSupport) {
+    fun addLight(light: Light) {
         lights.add(light)
     }
 

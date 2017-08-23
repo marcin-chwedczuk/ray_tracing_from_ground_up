@@ -11,49 +11,48 @@ import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 
 public class AreaLight<out T>(val geometricObject: T)
-    : LightWithShadowSupport
+    : Light
     where
         T: GeometricObject,
         T: SupportsSurfaceSampling
 {
-    override var castsShadows: Boolean = true
-
     private val material = (geometricObject.material as EmissiveMaterial)
+    public override var generatesShadows: Boolean = true
 
-    // TODO: @mc bad design refactor to stateless light
-    private var samplePoint: Point3D = Point3D.zero
-    private var normalAtSamplePoint: Normal3D = Normal3D.axisY
-    private var wi: Vector3D = Vector3D.zero
+    override fun computeHitPointLightingAttributes(shadingInfo: ShadingInfo): HitPointLightingAttributes {
+        val samplePoint = geometricObject.samplePoint()
+        val normalAtSamplePoint = geometricObject.getNormalAtPoint(samplePoint)
+        val wi = (samplePoint - shadingInfo.hitPoint).norm()
 
-    override fun computeDirectionFromHitPointToLight(shadingInfo: ShadingInfo): Vector3D {
-        this.samplePoint = geometricObject.samplePoint()
-        this.normalAtSamplePoint = geometricObject.getNormalAtPoint(this.samplePoint)
+        return object : HitPointLightingAttributes {
+            override val toLightDirection: Vector3D
+                get() = wi
 
-        this.wi = (this.samplePoint - shadingInfo.hitPoint).norm()
-        return this.wi
-    }
+            override fun isHitPointInShadow(shadowRay: Ray): Boolean {
+                return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay)
+            }
 
-    override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
-        return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance=Double.MAX_VALUE)
-    }
+            override fun radiance(): RgbColor {
+                // Light is emitted only in surface normal direction
+                // (in other words light is emitted only from one side of e.g. glowing rectangle)
 
-    override fun computeLuminanceContributedByLight(shadingInfo: ShadingInfo): RgbColor {
-        // Light is emitted only in surface normal direction
-        if ((-wi dot normalAtSamplePoint) < 0.0)
-            return RgbColor.black
+                if ((-wi dot normalAtSamplePoint) < 0.0)
+                    return RgbColor.black
 
-        return material.getRadiance()
-    }
+                return material.getRadiance()
+            }
 
-    override fun geometricFactor(info: ShadingInfo): Double {
-        val ndotd = -wi dot normalAtSamplePoint
-	    val d2 	= samplePoint.distanceToSquared(info.hitPoint)
+            override fun samplePointGeometricFactor(): Double {
+                val ndotd = -wi dot normalAtSamplePoint
+                val d2 	= samplePoint.distanceToSquared(shadingInfo.hitPoint)
 
-	    val result = (ndotd / d2)
-        return result
-    }
+                val result = (ndotd / d2)
+                return result
+            }
 
-    override fun monteCarloPdf(info: ShadingInfo): Double {
-        return geometricObject.getPdfOfSample(samplePoint)
+            override fun samplePointPdf(): Double {
+                return geometricObject.getPdfOfSample(samplePoint)
+            }
+        }
     }
 }

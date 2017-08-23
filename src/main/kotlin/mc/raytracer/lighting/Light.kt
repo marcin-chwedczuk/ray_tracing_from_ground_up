@@ -6,9 +6,30 @@ import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 
 public interface Light {
-    fun computeDirectionFromHitPointToLight(
-            shadingInfo: ShadingInfo): Vector3D
+    val generatesShadows: Boolean
 
-    fun computeLuminanceContributedByLight(
-            shadingInfo: ShadingInfo): RgbColor
+    fun computeHitPointLightingAttributes(shadingInfo: ShadingInfo)
+            : HitPointLightingAttributes
+}
+
+public interface HitPointLightingAttributes {
+    val toLightDirection: Vector3D
+
+    fun isHitPointInShadow(shadowRay: Ray): Boolean
+
+    fun radiance(): RgbColor
+
+    /**
+     * Geometric factor for selected sample point.
+     */
+    fun samplePointGeometricFactor(): Double {
+        return 1.0
+    }
+
+    /**
+     * Probability density function value for selected sample point.
+     */
+    fun samplePointPdf(): Double {
+        return 1.0
+    }
 }

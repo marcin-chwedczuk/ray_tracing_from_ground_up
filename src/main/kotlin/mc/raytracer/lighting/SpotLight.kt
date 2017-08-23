@@ -9,42 +9,46 @@ import mc.raytracer.util.ShadingInfo
 
 public class SpotLight(
         val location: Point3D,
-        val lookAt: Vector3D,
-        val innerCutOff: Angle,
+        val raysDirection: Vector3D,
+        val beamAngle: Angle,
         val color: RgbColor,
         val radianceScalingFactor: Double = 1.0,
         val cutOffExponent: Double = 500.0
-): LightWithShadowSupport {
+): Light {
 
-    override var castsShadows: Boolean = true
+    private val raysDirectionReversed = -raysDirection.norm()
+    private val cosOfBeamAngle = beamAngle.cos()
 
-    private val reversedNormalizedLookAt = -lookAt.norm()
+    public override var generatesShadows: Boolean = true
 
-    private val innerCutOffCos = innerCutOff.cos()
+    override fun computeHitPointLightingAttributes(shadingInfo: ShadingInfo): HitPointLightingAttributes {
+        return object : HitPointLightingAttributes {
 
-    override fun computeDirectionFromHitPointToLight(shadingInfo: ShadingInfo): Vector3D {
-        return (location - shadingInfo.hitPoint).norm()
-    }
+            override val toLightDirection: Vector3D by lazy {
+                (location - shadingInfo.hitPoint).norm()
+            }
 
-    override fun computeLuminanceContributedByLight(shadingInfo: ShadingInfo): RgbColor {
-        val toLight = computeDirectionFromHitPointToLight(shadingInfo)
-        val toLightNormalCos = reversedNormalizedLookAt dot toLight
+            override fun isHitPointInShadow(shadowRay: Ray): Boolean {
+                val maxDistance = shadowRay.origin.distanceTo(location)
+                return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance)
+            }
 
-        if (toLightNormalCos > innerCutOffCos) {
-            return color * radianceScalingFactor
+            override fun radiance(): RgbColor {
+                val toLightNormalCos = raysDirectionReversed dot toLightDirection
+
+                if (toLightNormalCos > cosOfBeamAngle) {
+                    return color * radianceScalingFactor
+                }
+
+                val angleToSpotlightCone =
+                        Math.acos(toLightNormalCos) - beamAngle.toRadians()
+
+                val tmp = Math.cos(angleToSpotlightCone)
+                if (tmp <= 0.0) return RgbColor.black
+
+                return color * radianceScalingFactor * Math.pow(tmp, cutOffExponent)
+
+            }
         }
-
-        val angleToSpotlightCone =
-                Math.acos(toLightNormalCos) - innerCutOff.toRadians()
-
-        val tmp = Math.cos(angleToSpotlightCone)
-        if (tmp <= 0.0) return RgbColor.black
-
-        return color * radianceScalingFactor * Math.pow(tmp, cutOffExponent)
-    }
-
-    override fun isHitPointInShadow(shadingInfo: ShadingInfo, shadowRay: Ray): Boolean {
-        val maxDistance = shadowRay.origin.distanceTo(location)
-        return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance)
     }
 }

@@ -65,7 +65,7 @@ abstract class BaseCamera {
     val cameraUp: Vector3D
         get() = v
 
-    // look at unit vector (from lookAt point to eye)
+    // look at unit vector (from raysDirection point to eye)
     protected var w = Vector3D(0,0,1)
     val cameraLookAt: Vector3D
         get() = -w
