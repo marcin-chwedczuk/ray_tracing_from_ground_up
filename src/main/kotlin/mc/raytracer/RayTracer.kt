@@ -13,6 +13,7 @@ import mc.raytracer.math.*
 import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.MultiJitteredSampler
+import mc.raytracer.sampling.UniformSphereSampler
 import mc.raytracer.threading.CancelFlag
 import mc.raytracer.tracers.AreaLightingTracer
 import mc.raytracer.tracers.RayCasterTracer
@@ -34,7 +35,7 @@ class RayTracer {
 
     init {
         viewPlane = ViewPlane(400, 320, pixelSize = 2.0)
-        viewPlane.configureNumberOfSamplesPerPixel(4)
+        viewPlane.configureNumberOfSamplesPerPixel(256)
         //viewPlane.showOutOfGamutErrors = true
 
         val tracer = AreaLightingTracer() //  RayCasterTracer()
@@ -117,7 +118,7 @@ class RayTracer {
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 100.0)
-        // floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
+         floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
 
 
         GlobalRandom.setSeed(12348)
@@ -182,6 +183,7 @@ class RayTracer {
 
 
 
+        /*
         val disc = Disc(
                 Point3D(30,242,-100),
                 -Normal3D.axisY,
@@ -191,6 +193,17 @@ class RayTracer {
         }
         world.addObject(disc)
         world.addLight(AreaLight(disc))
+        */
+
+
+        val glowingSphere = Sphere(
+                Point3D(30, 242, -100),
+                180.0,
+                UniformSphereSampler.fromSquareSampler(MultiJitteredSampler(256))).apply {
+                    material = EmissiveMaterial(RgbColor.white, radianceScalingFactor = 4*PI*18)
+                }
+        world.addObject(glowingSphere)
+        world.addLight(AreaLight(glowingSphere))
 
         /*
         val torus = Torus(Point3D(0,0,0), 100.0, 30.0).apply {

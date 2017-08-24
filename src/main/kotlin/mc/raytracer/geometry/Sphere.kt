@@ -1,15 +1,26 @@
 package mc.raytracer.geometry
 
 import mc.raytracer.math.Normal3D
+import mc.raytracer.math.PI
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.sampling.HemisphereSampler
+import mc.raytracer.sampling.JitteredSampler
+import mc.raytracer.sampling.UniformSphereSampler
 import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 
 class Sphere(
         val center: Point3D,
-        val radius: Double
-    ): GeometricObject() {
+        val radius: Double,
+        sampler: UniformSphereSampler? = null
+    ): GeometricObject(), SupportsSurfaceSampling {
+
+    private val invertedArea = 1 / (4 * PI * radius)
+
+    private val sampler by lazy {
+        sampler ?: UniformSphereSampler.fromSquareSampler(JitteredSampler())
+    }
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -63,5 +74,17 @@ class Sphere(
         }
 
         return 0.0
+    }
+
+    override fun selectSamplePoint(): Point3D {
+        return center + (sampler.nextSampleVectorOnUnitSphere() * radius)
+    }
+
+    override fun pdfOfSamplePoint(point: Point3D): Double {
+        return invertedArea
+    }
+
+    override fun normalAtSamplePoint(point: Point3D): Normal3D {
+        return Normal3D.fromVector(point - center)
     }
 }
