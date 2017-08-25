@@ -10,7 +10,7 @@ public class Disc(
         val center: Point3D,
         val normal: Normal3D,
         val radius: Double,
-        sampler: CircleSampler?
+        sampler: CircleSampler? = null
 ): GeometricObject(), SupportsSurfaceSampling {
 
     private val sampler by lazy {
@@ -62,8 +62,8 @@ public class Disc(
         val point2D = sampler.nextSampleOnUnitDisk()
 
         val pointOnDisk = center +
-                localCoordinateSystem.u * point2D.x +
-                localCoordinateSystem.v * point2D.y
+                localCoordinateSystem.u * point2D.x * radius +
+                localCoordinateSystem.v * point2D.y * radius
 
         return pointOnDisk
     }

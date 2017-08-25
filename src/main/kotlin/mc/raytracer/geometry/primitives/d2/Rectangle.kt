@@ -29,7 +29,7 @@ class Rectangle(
         // val n = if ((-ray.direction dot normal) >= 0.0) normal else -normal
 
         return Hit(tmin = t,
-                localHitPoint = Point3D.zero + ((ray.origin + ray.direction*t) - point),
+                localHitPoint = Point3D.Companion.zero + ((ray.origin + ray.direction*t) - point),
                 normalAtHitPoint = normal)
     }
 

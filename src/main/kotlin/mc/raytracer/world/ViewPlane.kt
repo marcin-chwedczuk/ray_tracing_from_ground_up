@@ -29,6 +29,8 @@ class ViewPlane(
     }
 
     fun configureNumberOfSamplesPerPixel(num: Int) {
+        System.out.println("SAMPLES NUMBER PER PIXEL: " + num)
+
         if (num > 0) {
             sampler = MultiJitteredSampler(num)
         }

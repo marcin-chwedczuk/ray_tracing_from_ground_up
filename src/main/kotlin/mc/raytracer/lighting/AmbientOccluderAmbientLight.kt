@@ -3,6 +3,7 @@ package mc.raytracer.lighting
 import mc.raytracer.math.Ray
 import mc.raytracer.math.Vector3D
 import mc.raytracer.sampling.HemisphereSampler
+import mc.raytracer.util.LocalCoordinateSystem
 import mc.raytracer.util.RgbColor
 import mc.raytracer.util.ShadingInfo
 import java.lang.IllegalStateException
@@ -15,17 +16,14 @@ public class AmbientOccluderAmbientLight(
 ): AmbientLight {
 
     override fun radiance(shadingInfo: ShadingInfo): RgbColor {
-        // construct local coordinate system
-        val w = Vector3D(shadingInfo.normalAtHitPoint)
-        val v = (w cross Vector3D(0.0072, 1.0, 0.0034)).norm()
-        val u = v cross w
+        val localCoords = LocalCoordinateSystem.fromNormal(shadingInfo.normalAtHitPoint)
 
         // see: http://www.rorydriscoll.com/2009/01/07/better-sampling/
 
         // number of samples may be set on view plane or here
         // we may boost it a little
         val sample = sampler.nextVectorOnUnitHemispehere()
-        val rayDirection = (v * sample.x + w * sample.y + u * sample.z).norm()
+        val rayDirection = (localCoords.v*sample.x + localCoords.w*sample.y + localCoords.u*sample.z).norm()
         val shadowRay = Ray(shadingInfo.hitPoint, rayDirection)
 
         if (shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay)) {

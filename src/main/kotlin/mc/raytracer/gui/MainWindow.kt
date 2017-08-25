@@ -171,6 +171,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
 
                 currentResolution = index
                 changeToCurrentResolution()
+                sender.clearKey(key)
             }
 
             KeyEvent.VK_0 -> {
@@ -224,11 +225,13 @@ class MainWindow(val rayTracingThread: RayTracingThread)
                 currentSampleNumber++
                 rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
                         currentSampleNumber*currentSampleNumber)
+                sender.clearKey(key)
             }
             KeyEvent.VK_O -> {
                 currentSampleNumber = Math.max(1, currentSampleNumber-1)
                 rayTracer.viewPlane.configureNumberOfSamplesPerPixel(
                         currentSampleNumber*currentSampleNumber)
+                sender.clearKey(key)
             }
 
             KeyEvent.VK_L -> {
@@ -238,6 +241,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
                 else {
                     rayTracer.enableAmbientOcclusion(true)
                 }
+                sender.clearKey(key)
             }
         }
     }

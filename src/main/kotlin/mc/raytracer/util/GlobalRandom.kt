@@ -24,6 +24,9 @@ object GlobalRandom {
     fun nextDouble()
         = rnd.nextDouble()
 
+    fun nextDouble(lowerBound: Double, upperBound: Double)
+        = lowerBound + rnd.nextDouble() * (upperBound - lowerBound)
+
     fun nextPoint(xMin: Int, xMax: Int,
                   yMin: Int, yMax: Int,
                   zMin: Int, zMax: Int)

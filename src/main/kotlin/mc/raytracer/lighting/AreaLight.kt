@@ -27,7 +27,8 @@ public class AreaLight<out T>(val geometricObject: T)
                 get() = wi
 
             override fun isHitPointInShadow(shadowRay: Ray): Boolean {
-                return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay)
+                val t = shadowRay.distanceToPointOnPath(samplePoint)
+                return shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay, maxDistance = t)
             }
 
             override fun radiance(): RgbColor {

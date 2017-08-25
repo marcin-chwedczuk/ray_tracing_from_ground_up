@@ -1,4 +1,4 @@
-package mc.raytracer.geometry.primitives
+package mc.raytracer.geometry.primitives.d3
 
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Hit
