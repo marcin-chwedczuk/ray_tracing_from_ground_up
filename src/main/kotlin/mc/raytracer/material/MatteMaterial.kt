@@ -35,7 +35,7 @@ public class MatteMaterial(
                 }
 
                 if (!hitPointInShadow) {
-                    L = L + (lightningAttributes.radiance() * diffuseBrdf.evaluate(info, wo, wi) * ndotwi)
+                    L += (lightningAttributes.radiance() * diffuseBrdf.evaluate(info, wo, wi) * ndotwi)
                 }
             }
         }
