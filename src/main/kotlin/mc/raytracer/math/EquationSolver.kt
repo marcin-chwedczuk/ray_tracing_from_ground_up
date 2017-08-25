@@ -177,8 +177,8 @@ object EquationSolver {
     }
 
     private fun isZero(value: Double): Boolean {
-        val ZERO_ERROR = 1e-90
-        return ((-ZERO_ERROR <= value) && (value <= ZERO_ERROR))
+        val ZERO_ERROR = 1e-9
+        return ((-ZERO_ERROR) <= value) && (value <= ZERO_ERROR)
     }
 
 }
