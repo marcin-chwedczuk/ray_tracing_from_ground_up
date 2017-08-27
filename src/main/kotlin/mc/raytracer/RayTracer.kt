@@ -3,12 +3,10 @@ package mc.raytracer
 import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
-import mc.raytracer.geometry.primitives.d2.Rectangle
-import mc.raytracer.geometry.Sphere
+import mc.raytracer.geometry.primitives.d2.Annulus
+import mc.raytracer.geometry.primitives.d3.OpenCone
+import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.geometry.primitives.d3.Torus
-import mc.raytracer.geometry.primitives.d2.Disc
-import mc.raytracer.geometry.primitives.d2.Triangle
-import mc.raytracer.geometry.primitives.d3.Box
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
@@ -37,7 +35,7 @@ class RayTracer {
         viewPlane.configureNumberOfSamplesPerPixel(4)
         //viewPlane.showOutOfGamutErrors = true
 
-        val tracer =  RayCasterTracer() // AreaLightingTracer()
+        val tracer = AreaLightingTracer()
 
         //val tmp = ThinLensCamera(CircleSampler.fromSquareSampler(MultiJitteredSampler(numberOfSamples = 36)))
         camera = PinholeCamera()
@@ -84,7 +82,7 @@ class RayTracer {
             return
 
         if (isEnabled) {
-            world.ambientLight = ConstantColorAmbientLight(RgbColor.white)
+            world.ambientLight = ConstantColorAmbientLight(RgbColor.white, radianceScalingFactor = 0.25)
         }
         else {
             world.ambientLight = AmbientOccluderAmbientLight(
@@ -112,78 +110,45 @@ class RayTracer {
         rnd.setSeed(12345)
 
         enableAmbientOcclusion(false)
-        world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.red, radianceScalingFactor = 2.0))
+        world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.white, radianceScalingFactor = 2.0))
         world.addLight(DirectionalLight(Vector3D(0,-1,-1), RgbColor.orange, radianceScalingFactor = 1.0))
 
-        val floor = Plane(Point3D(0.0, -34.01, 0.0), Normal3D(0, 1, 0))
-        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 10.0)
-        // floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.1)
+        world.addLight(PointLight(Point3D(0,100,0), RgbColor.white))
+        world.addObject(Sphere(Point3D(0,100,0), 1.0).apply {
+            material = StaticColorMaterial(RgbColor.white).apply {
+                castsShadows = false
+            }
+        })
+
+        val floor = Plane(Point3D(0.0, 0.01, 0.0), Normal3D(0, 1, 0))
+        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 50.0)
+         floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.1)
 
         GlobalRandom.setSeed(12348)
 
+        world.addObject(OpenCone(180.0, 105.0).apply {
+            material = PhongMaterial(RgbColor.randomColor())
+        })
 
-        val minBoxSize = 20.0; val maxBoxSize = 40.0; val padding = 40.0
 
-        /*for (row in 1..10) {
-            for (col in 1..10) {
-                val x = (maxBoxSize + padding) * (col - 0.5)
-                val z = (maxBoxSize + padding) * (row - 0.5)
-
-                val boxSize = GlobalRandom.nextDouble(minBoxSize, maxBoxSize)
-                val height = GlobalRandom.nextDouble(30.0, 70.0)
-                val p0 = Point3D(x,-3.0,z) - Vector3D(1,0,1)*boxSize/2.0
-                val p1 = Point3D(x,height,z) + Vector3D(1,0,1)*boxSize/2.0
-
-                world.addObject(Box(p0,p1).apply {
-                    material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.8)
-                })
-            }
-        }
-
+        /*
         for (i in 1..30) {
-            val vertices = (1..3).map {
-                GlobalRandom.nextPoint(-100,100, 100,140, -100,100)
-            }
+            val location = GlobalRandom.nextPoint(-300,300, 40,120, -300,300)
+            val radius = GlobalRandom.nextDouble(10.0, 30.0)
 
-            world.addObject(Triangle(vertices[0], vertices[1], vertices[2]).apply {
+            world.addObject(Sphere(location, radius).apply {
                 material = PhongMaterial(RgbColor.randomColor())
             })
+
         }*/
 
-
-
-        /*val disc = Disc(Point3D(50,200,120), -Normal3D.axisY, 20.0, CircleSampler.fromSquareSampler(MultiJitteredSampler(256))).apply {
-            material = EmissiveMaterial(RgbColor.yellow, radianceScalingFactor = 50.5)
-        }
-        world.addLight(AreaLight(disc))
-        world.addObject(disc)*/
-
-/*
-        val rect = Rectangle(Point3D(0,100,0), Vector3D(100,0,0), Vector3D(0,0,100), MultiJitteredSampler(256)).apply {
-            material = EmissiveMaterial(RgbColor.yellow, radianceScalingFactor = 4.5)
-        }
-        world.addLight(AreaLight(rect))
-        world.addObject(rect)
-    //        */
-
-
-        val torus = Torus(100.0, 20.0).apply {
+        /*val torus = Torus(100.0, 20.0).apply {
             material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.1)
         }
-        world.addObject(torus)
-
-        /*val openCylinder = OpenCylinder(-3.0, 30.0, 30.0).apply {
-            material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.3)
-        }
-        world.addObject(openCylinder)
-        */
-        //world.addObject(Sphere(Point3D(50,80,50), 20.0).apply {
-        //    material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3)
-        //})
-
+        world.addObject(torus)*/
         world.addObject(floor)
 
-        /*S
+        /*
         world.addObject(OpenCylinder(1.0, 120.0, 50.0).apply {
             material = PhongMaterial(RgbColor.white, ambientCoefficient = 0.3, specularExponent = 300.0)
         })*/

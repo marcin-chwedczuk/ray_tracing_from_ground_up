@@ -1,14 +1,13 @@
-package mc.raytracer.geometry
+package mc.raytracer.geometry.primitives.d3
 
+import mc.raytracer.geometry.*
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.PI
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
-import mc.raytracer.sampling.HemisphereSampler
 import mc.raytracer.sampling.JitteredSampler
 import mc.raytracer.sampling.UniformSphereSampler
-import mc.raytracer.util.RgbColor
-import mc.raytracer.util.ShadingInfo
+import mc.raytracer.util.BoundingBox
 
 class Sphere(
         val center: Point3D,
@@ -22,24 +21,26 @@ class Sphere(
         sampler ?: UniformSphereSampler.fromSquareSampler(JitteredSampler())
     }
 
+    private val boundingBox: BoundingBox = BoundingBox(
+            center.x - radius, center.x + radius,
+            center.y - radius, center.y + radius,
+            center.z - radius, center.z + radius)
+
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
 
-        if (t >= K_EPSILON) {
-            val temp = ray.origin - center
-
-            return Hit(tmin = t,
-                localHitPoint = ray.origin+ray.direction*t,
-                normalAtHitPoint = Normal3D.fromVector((temp + ray.direction*t)/radius))
-        }
-        else {
+        if (t === null)
             return Miss.instance
-        }
+
+        val temp = ray.origin - center
+
+        return Hit(tmin = t,
+                localHitPoint = ray.pointOnRayPath(t),
+                normalAtHitPoint = Normal3D.fromVector(temp + ray.direction * t))
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {
-        val t = findIntersection(shadowRay)
-        return if (t >= K_EPSILON) t else null
+        return findIntersection(shadowRay)
     }
 
     /**
@@ -47,17 +48,20 @@ class Sphere(
      * is the nearest point on the sphere that intersects the ray.
      * Returns {@code 0.0} when no such point exists.
      */
-    private fun findIntersection(ray: Ray): Double {
-        val a = ray.direction.dot(ray.direction)
+    private fun findIntersection(ray: Ray): Double? {
+        //if (!boundingBox.isIntersecting(ray))
+        //    return null
+
+        val a = ray.direction dot ray.direction
 
         val temp = ray.origin - center
-        val b = 2.0 * temp.dot(ray.direction)
-        val c = temp.dot(temp) - radius*radius
+        val b = 2.0 * (temp dot ray.direction)
+        val c = (temp dot temp) - radius*radius
 
         // compute solutions to quadratic equation
         val delta = b*b - 4.0*a*c
         if (delta < 0.0)
-            return 0.0
+            return null
 
         val deltaSqrt = Math.sqrt(delta)
 
@@ -73,7 +77,7 @@ class Sphere(
             return t
         }
 
-        return 0.0
+        return null
     }
 
     override fun selectSamplePoint(): Point3D {

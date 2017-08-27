@@ -66,11 +66,11 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         val white = RgbColor(1.0, 1.0, 1.0)
         val black = RgbColor(0.0, 0.0, 0.0)
         val red = RgbColor(1.0, 0.0, 0.0)
-        val orange = RgbColor(1.0, 0.529, 0.0)
         val yellow = RgbColor(1.0,1.0,0.0)
+        val orange = RgbColor(1.0, 0.529, 0.0)
+        val pink = RgbColor(255, 105, 180)
         val green = RgbColor(0.0, 1.0, 0.0)
         val blue = RgbColor(0.0, 0.0, 1.0)
-        val pink = RgbColor(255,105,180)
 
         fun grayscale(value: Double): RgbColor {
             val clamped = value.clamp(0.0, 1.0)
@@ -78,10 +78,7 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
         }
 
         fun randomColor()
-            = RgbColor(
-                GlobalRandom.nextDouble(),
-                GlobalRandom.nextDouble(),
-                GlobalRandom.nextDouble())
+            = RgbColor.fromHsv(GlobalRandom.nextDouble(0.0, 360.0), 1.0, 1.0)
 
         fun fromArgb(color: Long): RgbColor {
             val r = ((0xFF0000L and color) shr 16) / 255.0
@@ -89,6 +86,37 @@ class RgbColor(val r: Float, val g: Float, val b: Float) {
             val b = ((0x0000FFL and color) shr  0) / 255.0
 
             return RgbColor(r,g,b)
+        }
+
+        /**
+         * Create {@code RgbColor} from HSV values.
+         *
+         * @param h Hue, in degrees from 0 up to 360
+         * @param s Saturation from 0 to 1 (1 means full color, 0 means white)
+         * @param v Value from 0 to 1 (1 means full color, 0 means black)
+         */
+        fun fromHsv(h: Double, s: Double, v: Double): RgbColor {
+            // adapted from: https://stackoverflow.com/a/6930407/1779504
+
+            if(s <= 0.0) {
+                return RgbColor(v,v,v)
+            }
+
+            val hh = (if(h >= 360.0) 0.0 else h) / 60.0
+            val i = hh.toLong()
+            val ff = hh - i
+            val p = v * (1.0 - s)
+            val q = v * (1.0 - (s * ff))
+            val t = v * (1.0 - (s * (1.0 - ff)))
+
+            return when(i) {
+                0L -> RgbColor(v,t,p)
+                1L -> RgbColor(q,v,p)
+                2L -> RgbColor(p,v,t)
+                3L -> RgbColor(p,q,v)
+                4L -> RgbColor(t,p,v)
+                else -> RgbColor(v,p,q)
+            }
         }
     }
 }
