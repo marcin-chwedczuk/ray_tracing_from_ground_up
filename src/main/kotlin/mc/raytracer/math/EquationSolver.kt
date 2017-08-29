@@ -10,6 +10,27 @@ object EquationSolver {
      *      c[0] + c[1]*x + c[2]*x^2 = 0
      *
      */
+    public fun solveX2_alt(c: List<Double>): List<Double> {
+        // Version from "Numerical recipes in C"
+
+        val C = c[0]; val B = c[1]; val A = c[2]
+
+        val delta = B*B - 4*A*C
+
+        if (isZero(delta)) {
+            return listOf(-B/(2.0*A))
+        }
+        else if (delta < 0.0) {
+            return emptyList()
+        }
+        else {
+            val sqrtDelta = Math.sqrt(delta)
+            val q = -0.5 * (B + Math.signum(B)*sqrtDelta)
+
+            return listOf(q/A, C/q)
+        }
+    }
+
     public fun solveX2(c: List<Double>): List<Double> {
         val p = c[ 1 ] / (2 * c[2])
         val q = c[ 0 ] / c[2]
@@ -32,14 +53,46 @@ object EquationSolver {
         return emptyList()
     }
 
-
     /**
      *  Solves equation:
      *
      *      c[0] + c[1]*x + c[2]*x^2 + c[3]*x^3 = 0
      *
      */
+    public fun solveX3_alt(c: List<Double>): List<Double> {
+        // Version from "Numerical recipes in C"
+        /* normal form: x^3 + Ax^2 + Bx + C = 0 */
+
+        val a = c[ 2 ] / c[ 3 ]
+        val b = c[ 1 ] / c[ 3 ]
+        val c = c[ 0 ] / c[ 3 ]
+
+        val Q = (a*a - 3*b) / 9
+        val R = (2*a*a*a - 9*a*b + 27*c) / 54
+
+        val Q3 = Q*Q*Q
+        if ((R*R) < Q3) {
+            val fi = Math.acos(R / Math.sqrt(Q3))
+            val m = -2.0 * Math.sqrt(Q)
+            val a3 = a / 3.0
+
+            return listOf(
+                    m*Math.cos((fi + 0*PI) / 3.0) - a3,
+                    m*Math.cos((fi + 2*PI) / 3.0) - a3,
+                    m*Math.cos((fi - 2*PI) / 3.0) - a3)
+        }
+        else {
+            val tmp = Math.abs(R) + Math.sqrt(R*R - Q3)
+            val A = -Math.signum(R)*Math.cbrt(tmp)
+            val B = if (isZero(A)) 0.0 else (Q / A)
+
+            return listOf((A+B) - a/3.0)
+        }
+
+    }
+
     public fun solveX3(c: List<Double>): List<Double> {
+        // Version from "Graphic Gems"
         /* normal form: x^3 + Ax^2 + Bx + C = 0 */
 
         val A = c[ 2 ] / c[ 3 ]

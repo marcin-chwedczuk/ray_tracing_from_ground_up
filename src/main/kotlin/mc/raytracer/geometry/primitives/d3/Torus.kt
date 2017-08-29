@@ -66,7 +66,7 @@ class Torus(
         val d3 = ray.direction.z
 
         // define the coefficients of the quartic equation
-        val sum_d_sqrd 	= d1 * d1 + d2 * d2 + d3 * d3
+        val sum_d_sqrd 	= 1.0 // d1 * d1 + d2 * d2 + d3 * d3
         val e			= x1 * x1 + y1 * y1 + z1 * z1 - sweptRadius * sweptRadius - tubeRadius*tubeRadius
         val f			= x1 * d1 + y1 * d2 + z1 * d3
         val four_a_sqrd	= 4.0 * sweptRadius * sweptRadius

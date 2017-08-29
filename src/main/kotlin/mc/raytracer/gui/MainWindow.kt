@@ -155,7 +155,7 @@ class MainWindow(val rayTracingThread: RayTracingThread)
     }
 
     private fun handleKeyPress(sender: KeyboardState, key: KeyboardState.KeyInfo, rayTracer: RayTracer) {
-        val step = 10.0
+        val step = .50
 
         when (key.keyCode) {
             KeyEvent.VK_ESCAPE, KeyEvent.VK_Q -> {

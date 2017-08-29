@@ -7,6 +7,9 @@ import mc.raytracer.geometry.primitives.d2.Annulus
 import mc.raytracer.geometry.primitives.d3.OpenCone
 import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.geometry.primitives.d3.Torus
+import mc.raytracer.geometry.primitives.d3.part.ConcavePartCylinder
+import mc.raytracer.geometry.primitives.d3.part.ConvexPartCylinder
+import mc.raytracer.geometry.primitives.d3.part.PartCylinder
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
@@ -110,26 +113,24 @@ class RayTracer {
         rnd.setSeed(12345)
 
         enableAmbientOcclusion(false)
-        world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.white, radianceScalingFactor = 2.0))
-        world.addLight(DirectionalLight(Vector3D(0,-1,-1), RgbColor.orange, radianceScalingFactor = 1.0))
+        // world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.white, radianceScalingFactor = 2.0))
+        world.addLight(DirectionalLight(Vector3D(0.0,-0.1,-1.0), RgbColor.orange, radianceScalingFactor = 1.0))
 
-        world.addLight(PointLight(Point3D(0,100,0), RgbColor.white))
-        world.addObject(Sphere(Point3D(0,100,0), 1.0).apply {
-            material = StaticColorMaterial(RgbColor.white).apply {
-                castsShadows = false
-            }
-        })
+        world.addLight(PointLight(Point3D(0.0,1.0,0.0), RgbColor.red))
 
-        val floor = Plane(Point3D(0.0, 0.01, 0.0), Normal3D(0, 1, 0))
+
+        val floor = Plane(Point3D(0.0, -1.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 50.0)
-         floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.1)
+        floor.material = MatteMaterial(RgbColor.white)
 
         GlobalRandom.setSeed(12348)
 
-        world.addObject(OpenCone(180.0, 105.0).apply {
-            material = PhongMaterial(RgbColor.randomColor())
+        world.addObject(ConcavePartCylinder(
+                2.0,
+                -1.0, 4.0,
+                Angle.fromDegrees(160), Angle.fromDegrees(360)).apply {
+            material = PhongMaterial(RgbColor.orange, ambientCoefficient = 0.25)
         })
-
 
         /*
         for (i in 1..30) {
@@ -142,7 +143,7 @@ class RayTracer {
 
         }*/
 
-        /*val torus = Torus(100.0, 20.0).apply {
+        /*val torus = Torus(10.0, 2.0).apply {
             material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.1)
         }
         world.addObject(torus)*/
