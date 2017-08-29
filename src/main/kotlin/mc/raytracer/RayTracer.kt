@@ -4,6 +4,7 @@ import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
 import mc.raytracer.geometry.primitives.d2.Annulus
+import mc.raytracer.geometry.primitives.d2.part.PartAnnulus
 import mc.raytracer.geometry.primitives.d3.OpenCone
 import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.geometry.primitives.d3.Torus
@@ -123,12 +124,10 @@ class RayTracer {
 
         GlobalRandom.setSeed(12348)
 
-        val torus = ConcavePartTorus(10.0, 2.0,
-                Angle.fromDegrees(0), Angle.fromDegrees(360),
-                Angle.fromDegrees(90), Angle.fromDegrees(270)).apply {
-            material = ChessboardMaterial(RgbColor.red, RgbColor.blue, ambientCoefficient = 0.24, patternSize = 0.3)
-        }
-        world.addObject(torus)
+        world.addObject(PartAnnulus(5.0, 10.0,
+                Angle.fromDegrees(0), Angle.fromDegrees(270)).apply {
+            material = MatteMaterial(RgbColor.red)
+        })
 
         /*
         for (i in 1..30) {
