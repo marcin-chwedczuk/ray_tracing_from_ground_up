@@ -7,9 +7,7 @@ import mc.raytracer.geometry.primitives.d2.Annulus
 import mc.raytracer.geometry.primitives.d3.OpenCone
 import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.geometry.primitives.d3.Torus
-import mc.raytracer.geometry.primitives.d3.part.ConcavePartCylinder
-import mc.raytracer.geometry.primitives.d3.part.ConvexPartCylinder
-import mc.raytracer.geometry.primitives.d3.part.PartCylinder
+import mc.raytracer.geometry.primitives.d3.part.*
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
@@ -119,15 +117,15 @@ class RayTracer {
         world.addLight(PointLight(Point3D(0.0,1.0,0.0), RgbColor.red))
 
 
-        val floor = Plane(Point3D(0.0, -1.01, 0.0), Normal3D(0, 1, 0))
+        val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 50.0)
         floor.material = MatteMaterial(RgbColor.white)
 
         GlobalRandom.setSeed(12348)
 
-        world.addObject(ConcavePartCylinder(
+        world.addObject(ConcavePartSphere(
                 2.0,
-                -1.0, 4.0,
+                Angle.fromDegrees(30), Angle.fromDegrees(100),
                 Angle.fromDegrees(160), Angle.fromDegrees(360)).apply {
             material = PhongMaterial(RgbColor.orange, ambientCoefficient = 0.25)
         })

@@ -25,6 +25,10 @@ class Angle {
     fun cos(): Double
             = Math.cos(angleInRadians)
 
+    fun withInRange(min: Angle, max: Angle): Boolean {
+        return (min.angleInRadians <= angleInRadians && angleInRadians <= max.angleInRadians)
+    }
+
     operator fun times(x: Int): Angle
         = this * x.toDouble()
 
@@ -48,5 +52,16 @@ class Angle {
 
         fun fromRadians(angleInRadians: Double)
             = Angle(angleInRadians)
+
+        fun fromAtan2(y: Double, x: Double): Angle {
+            var angleInRadians = Math.atan2(y, x)
+
+            // Normalize angle to 0..2PI
+            if (angleInRadians < 0.0) {
+                angleInRadians += 2* PI
+            }
+
+            return Angle(angleInRadians)
+        }
     }
 }
