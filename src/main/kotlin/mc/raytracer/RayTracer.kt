@@ -5,6 +5,7 @@ import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
 import mc.raytracer.geometry.compound.SolidCone
 import mc.raytracer.geometry.compound.SolidCylinder
+import mc.raytracer.geometry.compound.ThickRing
 import mc.raytracer.geometry.primitives.d2.Annulus
 import mc.raytracer.geometry.primitives.d2.part.PartAnnulus
 import mc.raytracer.geometry.primitives.d3.OpenCone
@@ -126,7 +127,7 @@ class RayTracer {
 
         GlobalRandom.setSeed(12348)
 
-        world.addObject(SolidCone(2.0, 1.0).apply {
+        world.addObject(ThickRing(5.0, 7.0, 1.0, 2.0).apply {
             material = PhongMaterial(RgbColor.red)
         })
 

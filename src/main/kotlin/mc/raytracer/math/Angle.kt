@@ -43,6 +43,8 @@ class Angle {
 
     companion object {
         val ZERO = fromDegrees(0)
+        val PI_RADIANS = fromDegrees(180)
+        val TWO_PI_RADIANS = fromDegrees(360)
 
         fun fromDegrees(angleInDegrees: Int)
             = fromDegrees(angleInDegrees.toDouble())
@@ -58,7 +60,7 @@ class Angle {
 
             // Normalize angle to 0..2PI
             if (angleInRadians < 0.0) {
-                angleInRadians += 2* PI
+                angleInRadians += 2 * PI
             }
 
             return Angle(angleInRadians)
