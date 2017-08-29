@@ -111,10 +111,10 @@ class RayTracer {
         rnd.setSeed(12345)
 
         enableAmbientOcclusion(false)
-        // world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.white, radianceScalingFactor = 2.0))
-        world.addLight(DirectionalLight(Vector3D(0.0,-0.1,-1.0), RgbColor.orange, radianceScalingFactor = 1.0))
+        world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
+       // world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 0.40))
 
-        world.addLight(PointLight(Point3D(0.0,1.0,0.0), RgbColor.red))
+        //world.addLight(PointLight(Point3D(0.0,1.0,0.0), RgbColor.red))
 
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
@@ -123,12 +123,12 @@ class RayTracer {
 
         GlobalRandom.setSeed(12348)
 
-        world.addObject(ConcavePartSphere(
-                2.0,
-                Angle.fromDegrees(30), Angle.fromDegrees(100),
-                Angle.fromDegrees(160), Angle.fromDegrees(360)).apply {
-            material = PhongMaterial(RgbColor.orange, ambientCoefficient = 0.25)
-        })
+        val torus = ConcavePartTorus(10.0, 2.0,
+                Angle.fromDegrees(0), Angle.fromDegrees(360),
+                Angle.fromDegrees(90), Angle.fromDegrees(270)).apply {
+            material = ChessboardMaterial(RgbColor.red, RgbColor.blue, ambientCoefficient = 0.24, patternSize = 0.3)
+        }
+        world.addObject(torus)
 
         /*
         for (i in 1..30) {
