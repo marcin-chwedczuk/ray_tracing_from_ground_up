@@ -18,10 +18,10 @@ public class ThickRing(
         addObject(Annulus(Point3D(0.0, yTop, 0.0), innerRadius, outerRadius, Normal3D.axisY))
 
         // inner side
-        addObject(ConcavePartCylinder(innerRadius, yBottom, yTop, Angle.ZERO, Angle.TWO_PI_RADIANS))
+        addObject(ConcavePartCylinder(innerRadius, yBottom, yTop, Angle.ZERO, Angle.RAD_TWO_PI))
 
         // outer side
-        addObject(ConcavePartCylinder(outerRadius, yBottom, yTop, Angle.ZERO, Angle.TWO_PI_RADIANS))
+        addObject(ConcavePartCylinder(outerRadius, yBottom, yTop, Angle.ZERO, Angle.RAD_TWO_PI))
 
         // bottom
         addObject(Annulus(Point3D(0.0, yBottom, 0.0), innerRadius, outerRadius, -Normal3D.axisY))

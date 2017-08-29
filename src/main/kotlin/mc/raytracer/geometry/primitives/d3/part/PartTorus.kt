@@ -104,7 +104,7 @@ open class PartTorus(
             val toCenter = Normal3D(hitPoint.x, 0.0, hitPoint.z)
             val rx = (hitPoint - Point3D.zero - toCenter*sweptRadius) dot toCenter
             val ry = hitPoint.y
-            val angleY = Angle.fromAtan2(rx, ry)
+            val angleY = Angle.fromAtan2(ry, rx)
             if (!angleY.withInRange(minTubeAngle, maxTubeAngle)) {
                 continue
             }

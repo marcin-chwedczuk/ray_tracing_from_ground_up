@@ -43,8 +43,12 @@ class Angle {
 
     companion object {
         val ZERO = fromDegrees(0)
-        val PI_RADIANS = fromDegrees(180)
-        val TWO_PI_RADIANS = fromDegrees(360)
+
+        val RAD_PI = fromDegrees(180)
+        val RAD_TWO_PI = fromDegrees(360)
+
+        val DEG_180 = fromDegrees(180)
+        val DEG_360 = fromDegrees(360)
 
         fun fromDegrees(angleInDegrees: Int)
             = fromDegrees(angleInDegrees.toDouble())
