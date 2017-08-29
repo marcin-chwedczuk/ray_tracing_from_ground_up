@@ -35,10 +35,12 @@ public class OpenCone(
     }
 
     private fun computeNormal(hitPoint: Point3D): Normal3D {
+        val hr = h / r
+
         return Normal3D(
-                h*hitPoint.x / r,
-                -(hitPoint.y - h),
-                h*hitPoint.z / r)
+                hitPoint.x*hr*hr,
+                h - hitPoint.y,
+                hitPoint.z*hr*hr)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

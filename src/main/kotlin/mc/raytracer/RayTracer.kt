@@ -3,6 +3,8 @@ package mc.raytracer
 import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.Plane
+import mc.raytracer.geometry.compound.SolidCone
+import mc.raytracer.geometry.compound.SolidCylinder
 import mc.raytracer.geometry.primitives.d2.Annulus
 import mc.raytracer.geometry.primitives.d2.part.PartAnnulus
 import mc.raytracer.geometry.primitives.d3.OpenCone
@@ -112,10 +114,10 @@ class RayTracer {
         rnd.setSeed(12345)
 
         enableAmbientOcclusion(false)
-        world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
-       // world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 0.40))
+        //world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
+       world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 2.40))
 
-        //world.addLight(PointLight(Point3D(0.0,1.0,0.0), RgbColor.red))
+        world.addLight(PointLight(Point3D(0.0,-1.0,0.0), RgbColor.red))
 
 
         val floor = Plane(Point3D(0.0, -3.01, 0.0), Normal3D(0, 1, 0))
@@ -124,9 +126,8 @@ class RayTracer {
 
         GlobalRandom.setSeed(12348)
 
-        world.addObject(PartAnnulus(5.0, 10.0,
-                Angle.fromDegrees(0), Angle.fromDegrees(270)).apply {
-            material = MatteMaterial(RgbColor.red)
+        world.addObject(SolidCone(2.0, 1.0).apply {
+            material = PhongMaterial(RgbColor.red)
         })
 
         /*
