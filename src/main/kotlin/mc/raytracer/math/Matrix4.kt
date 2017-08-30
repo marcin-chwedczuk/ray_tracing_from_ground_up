@@ -53,14 +53,14 @@ class Matrix4(
     operator fun times(other: Matrix4): Matrix4 {
         val copy = DoubleArray(MATRIX_ELEMENTS_COUNT)
 
-        for (y in 0..3) {
-            for (x in 0..3) {
+        for (row in 0..3) {
+            for (col in 0..3) {
                 var sum = 0.0
 
                 for (j in 0..3)
-                    sum += this[x, j] * other[j, y]
+                    sum += this[row, j] * other[j, col]
 
-                copy[x*4 + y] = sum
+                copy[row*4 + col] = sum
             }
         }
 

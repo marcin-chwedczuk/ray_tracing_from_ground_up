@@ -2,34 +2,46 @@ package mc.raytracer.geometry
 
 import mc.raytracer.math.Angle
 import mc.raytracer.math.Matrix4
+import mc.raytracer.math.Point3D
+import mc.raytracer.math.Vector3D
 
 public class InstanceBuilder(
         val geometricObject: GeometricObject)
 {
     private var matrixInverse: Matrix4 = Matrix4.IDENTITY
+    private var name: String = "unknown"
 
-    public fun translate(dx: Double, dy: Double, dz: Double): InstanceBuilder {
-        matrixInverse *= Matrix4.translateInverse(dx, dy, dz)
+    public fun named(name: String): InstanceBuilder {
+        this.name = name
         return this
     }
 
+    public fun translate(dx: Double, dy: Double, dz: Double): InstanceBuilder {
+        matrixInverse = matrixInverse * Matrix4.translateInverse(dx, dy, dz)
+        return this
+    }
+
+    public fun translate(vec: Vector3D): InstanceBuilder {
+        return translate(vec.x, vec.y, vec.z)
+    }
+
     public fun rotateX(angle: Angle): InstanceBuilder {
-        matrixInverse *= Matrix4.rotateXInverse(angle)
+        matrixInverse = matrixInverse * Matrix4.rotateXInverse(angle)
         return this
     }
 
     public fun rotateY(angle: Angle): InstanceBuilder {
-        matrixInverse *= Matrix4.rotateYInverse(angle)
+        matrixInverse = matrixInverse * Matrix4.rotateYInverse(angle)
         return this
     }
 
     public fun rotateZ(angle: Angle): InstanceBuilder {
-        matrixInverse *= Matrix4.rotateZInverse(angle)
+        matrixInverse = matrixInverse * Matrix4.rotateZInverse(angle)
         return this
     }
 
     public fun scale(sx: Double, sy: Double, sz: Double): InstanceBuilder {
-        matrixInverse *= Matrix4.scaleInverse(sx, sy, sz)
+        matrixInverse = matrixInverse * Matrix4.scaleInverse(sx, sy, sz)
         return this
     }
 
@@ -42,6 +54,6 @@ public class InstanceBuilder(
     }
 
     public fun create(): Instance {
-        return Instance(geometricObject, matrixInverse)
+        return Instance(geometricObject, matrixInverse, name)
     }
 }

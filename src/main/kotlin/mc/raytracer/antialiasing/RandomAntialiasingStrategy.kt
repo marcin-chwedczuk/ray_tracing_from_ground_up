@@ -19,7 +19,7 @@ class RandomAntialiasingStrategy(val numOfSamples: Int, val pixelSize: Double) {
                 val y = pixelTop + pixelSize*rnd.nextDouble()
                 val z = 1000.0
 
-                val ray = Ray(Point3D(x,y,z), vecZ)
+                val ray = Ray.create(Point3D(x,y,z), vecZ)
                 accColor += tracer.traceRay(ray)
         }
 

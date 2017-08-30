@@ -12,7 +12,7 @@ class SphereTest {
     @Test
     fun hitWorks() {
         val sphere = Sphere(Point3D(0, 0, 0), 10.0)
-        val ray = Ray(Point3D(0,0,100), Vector3D(0,0,-1))
+        val ray = Ray.create(Point3D(0,0,100), Vector3D(0,0,-1))
 
         val result = sphere.hit(ray)
 

@@ -47,7 +47,7 @@ class ThinLensCamera(val lensSampler: CircleSampler)
 
                     val rayOrigin = eye + lensPoint.x*u + lensPoint.y*v
                     val rayDirection = rayDirection(Point2D(x,y), lensPoint)
-                    val ray = Ray(rayOrigin, rayDirection)
+                    val ray = Ray.create(rayOrigin, rayDirection)
 
                     L += tracer.traceRay(ray)
                 }

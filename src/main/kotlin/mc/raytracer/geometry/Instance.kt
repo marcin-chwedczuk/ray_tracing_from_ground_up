@@ -6,12 +6,15 @@ import mc.raytracer.math.Ray
 
 public class Instance(
         private val geometricObject: GeometricObject,
-        private val rayTransformation: Matrix4
+        private val rayTransformation: Matrix4,
+        private val name: String
 ): GeometricObject() {
 
+    private var customMaterial: Material? = null
+
     override var material: Material
-        get() = geometricObject.material
-        set(value) { geometricObject.material = value }
+        get() = customMaterial ?: geometricObject.material
+        set(value) { customMaterial = value }
 
     override fun hit(ray: Ray): HitResult {
         val transformedRay = ray.transform(rayTransformation)

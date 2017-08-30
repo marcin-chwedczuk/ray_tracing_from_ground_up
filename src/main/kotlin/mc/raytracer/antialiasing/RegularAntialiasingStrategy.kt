@@ -24,7 +24,7 @@ class RegularAntialiasingStrategy(val samplesPerPixelSide: Int, val pixelSize: D
                 val y = pixelTop + sampleSize*(col - 0.5)
                 val z = 1000.0
 
-                val ray = Ray(Point3D(x,y,z), vecZ)
+                val ray = Ray.create(Point3D(x,y,z), vecZ)
                 accColor += tracer.traceRay(ray)
             }
         }

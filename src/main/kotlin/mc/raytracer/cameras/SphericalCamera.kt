@@ -39,7 +39,7 @@ class SphericalCamera: BaseCamera() {
                     val direction = computeRayDirection(
                             x,y, vres, hres, pixelSize)
 
-                    val ray = Ray(eye, direction)
+                    val ray = Ray.create(eye, direction)
                     L += tracer.traceRay(ray)
                 }
                 L /= viewPlane.numberOfSamplesPerPixel.toDouble()

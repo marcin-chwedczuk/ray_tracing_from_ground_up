@@ -24,7 +24,7 @@ public class AmbientOccluderAmbientLight(
         // we may boost it a little
         val sample = sampler.nextVectorOnUnitHemispehere()
         val rayDirection = (localCoords.v*sample.x + localCoords.w*sample.y + localCoords.u*sample.z).norm()
-        val shadowRay = Ray(shadingInfo.hitPoint, rayDirection)
+        val shadowRay = Ray.create(shadingInfo.hitPoint, rayDirection)
 
         if (shadingInfo.world.existsCastingShadowObjectInDirection(shadowRay)) {
             return color * radianceScalingFactor * minRadience

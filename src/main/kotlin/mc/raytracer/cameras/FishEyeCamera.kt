@@ -44,7 +44,7 @@ class FishEyeCamera: BaseCamera() {
                     if (direction == null)
                         continue
 
-                    val ray = Ray(eye, direction)
+                    val ray = Ray.create(eye, direction)
 
                     L += tracer.traceRay(ray)
                 }

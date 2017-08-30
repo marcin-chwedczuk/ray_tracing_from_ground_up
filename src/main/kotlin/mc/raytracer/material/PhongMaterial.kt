@@ -35,7 +35,7 @@ public class PhongMaterial(
                 var hitPointInShadow = false
 
                 if (light.generatesShadows) {
-                    val shadowRay = Ray(info.hitPoint, wi)
+                    val shadowRay = Ray.create(info.hitPoint, wi)
                     hitPointInShadow = lightningAttributes.isHitPointInShadow(shadowRay)
                 }
 
@@ -69,7 +69,7 @@ public class PhongMaterial(
                 var hitPointInShadow = false
 
                 if (light.generatesShadows) {
-                    val shadowRay = Ray(info.hitPoint, wi)
+                    val shadowRay = Ray.create(info.hitPoint, wi)
                     hitPointInShadow = lightingAttributes.isHitPointInShadow(shadowRay)
                 }
 

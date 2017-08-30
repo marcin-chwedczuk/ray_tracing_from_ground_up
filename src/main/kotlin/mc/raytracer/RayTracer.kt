@@ -4,6 +4,7 @@ import mc.raytracer.cameras.*
 import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.primitives.d3.Plane
 import mc.raytracer.geometry.compound.*
+import mc.raytracer.geometry.primitives.d3.Box
 import mc.raytracer.geometry.primitives.d3.Torus
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
@@ -110,9 +111,9 @@ class RayTracer {
         world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
         world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 1.00))
 
-        val floor = Plane(Point3D(0.0, -13.01, 0.0), Normal3D(0, 1, 0))
-        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 50.0)
-        floor.material = MatteMaterial(RgbColor.white)
+        val floor = Plane(Point3D(0.0, -0.01, 0.0), Normal3D(0, 1, 0))
+        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 5.0)
+        //floor.material = MatteMaterial(RgbColor.white)
 
         /*
         for (i in 1..30) {
@@ -128,9 +129,21 @@ class RayTracer {
             material = MatteMaterial(RgbColor.red, ambientCoefficient = 0.1)
         }
 
-        world.addObject(torus.newInstance()
-                .rotateX(Angle.DEG_90)
+        val box = Box(Point3D(-1,-1,-1), Point3D(1,1,1)).apply {
+            material = MatteMaterial(RgbColor.red)
+        }
+
+        world.addObject(box.newInstance()
+                .named("rotated red")
+                .scale(1.0, 1.0, 3.0)
                 .create())
+
+        world.addObject(box.newInstance()
+                .named("yellow")
+                .scale(3.0,1.0,1.0)
+                .create().apply {
+            material = MatteMaterial(RgbColor.yellow)
+        })
 
         world.addObject(floor)
     }

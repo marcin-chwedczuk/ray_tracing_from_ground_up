@@ -27,7 +27,7 @@ class JitteredAntialiasingStrategy(val samplesPerPixelSide: Int, val pixelSize: 
                 val y = pixelTop + sampleSize*(col - rnd.nextDouble())
                 val z = 1000.0
 
-                val ray = Ray(Point3D(x,y,z), vecZ)
+                val ray = Ray.create(Point3D(x,y,z), vecZ)
                 accColor += tracer.traceRay(ray)
             }
         }

@@ -48,7 +48,7 @@ class PinholeCamera : BaseCamera() {
                     val y = pixelSize * (vres / 2.0 - r + p.y)
 
                     val direction = x * u + y * v - dist * w
-                    val ray = Ray(eye, direction)
+                    val ray = Ray.create(eye, direction)
 
                     L += tracer.traceRay(ray)
                 }
@@ -88,7 +88,7 @@ class PinholeCamera : BaseCamera() {
                     val y = pixelSize * (vres / 2.0 - r + p.y) + viewPortOffsetY
 
                     val direction = x * u + y * v - dist * w
-                    val ray = Ray(eye, direction)
+                    val ray = Ray.create(eye, direction)
 
                     L += tracer.traceRay(ray)
                 }

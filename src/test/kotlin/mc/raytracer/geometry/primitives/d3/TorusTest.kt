@@ -11,7 +11,7 @@ class TorusTest {
     @Test
     fun hitWorks() {
         val tori = Torus(50.0, 10.0)
-        val ray = Ray(Point3D.zero, -Vector3D.axisZ)
+        val ray = Ray.create(Point3D.zero, -Vector3D.axisZ)
 
         val result = tori.hit(ray)
 
