@@ -28,7 +28,7 @@ class StereoCamera<out CameraType : BaseCamera>(
     var pixelGap = 8
         set(newGap) {
             if (newGap < 0)
-                throw IllegalArgumentException("newGap cannot be less than zero.")
+                throw IllegalArgumentException("newGap cannot be less than ZERO.")
 
             field = newGap
         }

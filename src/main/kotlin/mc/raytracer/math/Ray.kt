@@ -15,4 +15,11 @@ class Ray(
     fun distanceToPointOnPath(point: Point3D): Double {
         return (point - origin) dot direction
     }
+
+    fun transform(matrix: Matrix4): Ray {
+        val newOrigin = matrix*origin
+        val newDirection = matrix*direction
+
+        return Ray(newOrigin, newDirection)
+    }
 }

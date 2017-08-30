@@ -7,8 +7,6 @@ import mc.raytracer.math.Point3D
 import mc.raytracer.math.Vector3D
 import mc.raytracer.threading.CancelFlag
 import mc.raytracer.util.RawBitmap
-import mc.raytracer.util.RgbColor
-import mc.raytracer.world.ViewPlane
 import mc.raytracer.world.World
 
 abstract class BaseCamera {
@@ -98,21 +96,21 @@ abstract class BaseCamera {
         }
 
         // rotate camera - order of operations is important
-        var rotationMatrix = Matrix4.identity
+        var rotationMatrix = Matrix4.IDENTITY
 
         if (Math.abs(rollAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(w, Angle.fromDegrees(rollAngleInDegrees))
+                    Matrix4.rotate(w, Angle.fromDegrees(rollAngleInDegrees))
         }
 
         if (Math.abs(yawAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(v, Angle.fromDegrees(yawAngleInDegrees))
+                    Matrix4.rotate(v, Angle.fromDegrees(yawAngleInDegrees))
         }
 
         if (Math.abs(pitchAngleInDegrees) > K_EPSILON) {
             rotationMatrix *=
-                    Matrix4.rotationMatrix(u, Angle.fromDegrees(pitchAngleInDegrees))
+                    Matrix4.rotate(u, Angle.fromDegrees(pitchAngleInDegrees))
         }
 
         w = (rotationMatrix*w).norm()

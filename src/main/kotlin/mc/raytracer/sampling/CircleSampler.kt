@@ -44,7 +44,7 @@ class CircleSampler private constructor(
                 }
                 else {				// sector 4
                     r = -y
-                    if (y != 0.0)	// avoid division by zero at origin
+                    if (y != 0.0)	// avoid division by ZERO at origin
                         phi = 6 - x/y
                     else
                         phi  = 0.0

@@ -57,7 +57,7 @@ class ViewPlane(
 
     fun setViewPlaneWidth(newWidth: Double) {
         if (newWidth <= 0)
-            throw IllegalArgumentException("newWidth cannot be less then zero.")
+            throw IllegalArgumentException("newWidth cannot be less then ZERO.")
 
         this.pixelSize = newWidth / horizontalResolution
     }

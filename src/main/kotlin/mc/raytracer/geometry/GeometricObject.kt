@@ -13,6 +13,8 @@ abstract class GeometricObject {
     abstract fun hit(ray: Ray): HitResult
     abstract fun shadowHit(shadowRay: Ray): Double?
 
+    fun newInstance() = InstanceBuilder(this)
+
     companion object {
         // TODO: @mc define this separately for each gemetric object
         val K_EPSILON = 0.0001

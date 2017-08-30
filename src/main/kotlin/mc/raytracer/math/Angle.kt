@@ -47,6 +47,7 @@ class Angle {
         val RAD_PI = fromDegrees(180)
         val RAD_TWO_PI = fromDegrees(360)
 
+        val DEG_90 = fromDegrees(90)
         val DEG_180 = fromDegrees(180)
         val DEG_360 = fromDegrees(360)
 
