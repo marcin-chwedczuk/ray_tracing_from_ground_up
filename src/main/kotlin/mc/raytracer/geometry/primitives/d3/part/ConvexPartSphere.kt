@@ -23,6 +23,7 @@ public class ConvexPartSphere(
 
         return Hit(tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 }

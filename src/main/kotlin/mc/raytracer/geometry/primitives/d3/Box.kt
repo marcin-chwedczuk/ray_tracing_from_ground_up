@@ -7,6 +7,7 @@ import mc.raytracer.geometry.Miss
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 
 public class Box(
     val minCorner: Point3D,
@@ -18,6 +19,10 @@ public class Box(
         if (minCorner.y > maxCorner.y) throw IllegalArgumentException("minCorner.y must be less than maxCorner.y")
         if (minCorner.z > maxCorner.z) throw IllegalArgumentException("minCorner.z must be less than maxCorner.z")
     }
+
+    private val _boundingBox = BoundingBox.fromMinMaxPoints(minCorner, maxCorner)
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
 
     public override fun hit(ray: Ray): HitResult {
         val ox = ray.origin.x;    val oy = ray.origin.y; 	val oz = ray.origin.z
@@ -95,7 +100,8 @@ public class Box(
             return Hit(
                     tmin = tmin,
                     localHitPoint = ray.pointOnRayPath(tmin),
-                    normalAtHitPoint = getNormal(face))
+                    normalAtHitPoint = getNormal(face),
+                    material = material)
         }
 
         return Miss.instance

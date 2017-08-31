@@ -7,6 +7,7 @@ import mc.raytracer.math.*
 import mc.raytracer.math.Vector3D
 import mc.raytracer.sampling.JitteredSampler
 import mc.raytracer.sampling.SquareSampler
+import mc.raytracer.util.BoundingBox
 
 class Rectangle(
         val point: Point3D,
@@ -19,6 +20,21 @@ class Rectangle(
     private val invertedArea = 1.0 / (spanA cross spanB).length
     private val sampler by lazy { sampler ?: JitteredSampler() }
 
+    private val _boudingBox = computeBoundingBox()
+
+    override val boundingBox: BoundingBox
+        get() = _boudingBox
+
+    private fun computeBoundingBox(): BoundingBox {
+        val corners = listOf(
+                point,
+                point + spanA,
+                point + spanB,
+                point + spanA + spanB)
+
+        return BoundingBox.containingPoints(corners)
+    }
+
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
 
@@ -30,7 +46,8 @@ class Rectangle(
 
         return Hit(tmin = t,
                 localHitPoint = Point3D.Companion.zero + ((ray.origin + ray.direction*t) - point),
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

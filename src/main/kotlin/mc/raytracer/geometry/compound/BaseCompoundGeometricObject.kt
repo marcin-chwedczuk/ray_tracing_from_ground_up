@@ -6,9 +6,14 @@ import mc.raytracer.geometry.HitResult
 import mc.raytracer.geometry.Miss
 import mc.raytracer.material.Material
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 
 public open class BaseCompoundGeometricObject: GeometricObject() {
     private val geometricObjects = mutableListOf<GeometricObject>()
+    private var _boundingBox = BoundingBox.EMPTY
+
+    public override val boundingBox: BoundingBox
+            get() = _boundingBox
 
     override var material: Material
         get() {
@@ -24,9 +29,15 @@ public open class BaseCompoundGeometricObject: GeometricObject() {
 
     public fun addObject(geometricObject: GeometricObject) {
         geometricObjects.add(geometricObject)
+        _boundingBox = _boundingBox.merge(geometricObject.boundingBox)
     }
 
+
     override fun hit(ray: Ray): HitResult {
+        if (!boundingBox.isIntersecting(ray)) {
+            return Miss.instance
+        }
+
         return geometricObjects
                 .map { it.hit(ray) }
                 .filterIsInstance<Hit>()
@@ -35,6 +46,10 @@ public open class BaseCompoundGeometricObject: GeometricObject() {
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {
+        if (!boundingBox.isIntersecting(shadowRay)) {
+            return null
+        }
+
         return geometricObjects
                 .mapNotNull { it.shadowHit(shadowRay) }
                 .minBy { it }

@@ -4,6 +4,7 @@ import mc.raytracer.geometry.*
 import mc.raytracer.math.*
 import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.JitteredSampler
+import mc.raytracer.util.BoundingBox
 import mc.raytracer.util.LocalCoordinateSystem
 
 public class PartAnnulus(
@@ -23,6 +24,14 @@ public class PartAnnulus(
             throw IllegalArgumentException("innerRadius must be >= 0.")
     }
 
+    private val _boundingBox = BoundingBox(
+            -outerRadius, outerRadius,
+            -outerRadius, outerRadius,
+            -outerRadius, outerRadius)
+
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
+
     private val radiusDelta = outerRadius - innerRadius
 
     override fun hit(ray: Ray): HitResult {
@@ -36,7 +45,8 @@ public class PartAnnulus(
         return Hit(
                 tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

@@ -105,6 +105,14 @@ class Matrix4(
             0.0, 0.0, 0.0, 0.0
         ))
 
+        fun scale(xScale: Double, yScale: Double, zScale: Double): Matrix4 {
+            return Matrix4(
+                    xScale, 0.0, 0.0, 0.0,
+                    0.0, yScale, 0.0, 0.0,
+                    0.0, 0.0, zScale, 0.0,
+                    0.0, 0.0, 0.0,    1.0)
+        }
+
         fun scaleInverse(xScale: Double, yScale: Double, zScale: Double): Matrix4 {
             return Matrix4(
                     1.0/xScale, 0.0, 0.0, 0.0,
@@ -113,11 +121,30 @@ class Matrix4(
                     0.0, 0.0, 0.0, 1.0)
         }
 
+        fun translate(dx: Double, dy: Double, dz: Double): Matrix4 {
+            return Matrix4(
+                    1.0, 0.0, 0.0, dx,
+                    0.0, 1.0, 0.0, dy,
+                    0.0, 0.0, 1.0, dz,
+                    0.0, 0.0, 0.0, 1.0)
+        }
+
         fun translateInverse(dx: Double, dy: Double, dz: Double): Matrix4 {
             return Matrix4(
                     1.0, 0.0, 0.0, -dx,
                     0.0, 1.0, 0.0, -dy,
                     0.0, 0.0, 1.0, -dz,
+                    0.0, 0.0, 0.0, 1.0)
+        }
+
+        fun rotateX(angle: Angle): Matrix4 {
+            val sin = angle.sin()
+            val cos = angle.cos()
+
+            return Matrix4(
+                    1.0, 0.0, 0.0, 0.0,
+                    0.0, cos, -sin, 0.0,
+                    0.0, sin, cos, 0.0,
                     0.0, 0.0, 0.0, 1.0)
         }
 
@@ -132,6 +159,17 @@ class Matrix4(
                     0.0, 0.0, 0.0, 1.0)
         }
 
+        fun rotateY(angle: Angle): Matrix4 {
+            val sin = angle.sin()
+            val cos = angle.cos()
+
+            return Matrix4(
+                    cos, 0.0, sin, 0.0,
+                    0.0, 1.0, 0.0, 0.0,
+                    -sin, 0.0, cos, 0.0,
+                    0.0, 0.0, 0.0, 1.0)
+        }
+
         fun rotateYInverse(angle: Angle): Matrix4 {
             val sin = angle.sin()
             val cos = angle.cos()
@@ -140,6 +178,17 @@ class Matrix4(
                     cos, 0.0, -sin, 0.0,
                     0.0, 1.0, 0.0, 0.0,
                     sin, 0.0, cos, 0.0,
+                    0.0, 0.0, 0.0, 1.0)
+        }
+
+        fun rotateZ(angle: Angle): Matrix4 {
+            val sin = angle.sin()
+            val cos = angle.cos()
+
+            return Matrix4(
+                    cos, -sin, 0.0, 0.0,
+                    sin, cos, 0.0, 0.0,
+                    0.0, 0.0, 1.0, 0.0,
                     0.0, 0.0, 0.0, 1.0)
         }
 
@@ -154,8 +203,20 @@ class Matrix4(
                     0.0, 0.0, 0.0, 1.0)
         }
 
+        fun shear(
+            hyx: Double = 0.0, hzx: Double = 0.0,
+            hxy: Double = 0.0, hzy: Double = 0.0,
+            hxz: Double = 0.0, hyz: Double = 0.0
+        ) : Matrix4 {
+            return Matrix4(
+                    1.0, hyx, hzx, 0.0,
+                    hxy, 1.0, hzy, 0.0,
+                    hxz, hyz, 1.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0)
+        }
+
         /**
-         * General shearing matrix:
+         * Returns inverse of the general shearing matrix:
          * |   1 hyx hzx   0 |
          * | hxy   1 hzy   0 |
          * | hxz hyz   1   0 |
@@ -197,10 +258,6 @@ class Matrix4(
                 0.0,               0.0,               0.0,               0.0
             ))
             // @formatter:on
-        }
-
-        private inline fun set(m: DoubleArray, row: Int, col: Int, value: Double) {
-            m[row*4+col] = value
         }
     }
 }

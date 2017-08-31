@@ -13,11 +13,13 @@ class Torus(
         val tubeRadius: Double = 1.0
     ) : GeometricObject() {
 
-    private val boundingBox = BoundingBox(
+    private val _boundingBox = BoundingBox(
             -sweptRadius - tubeRadius, sweptRadius + tubeRadius,
             -tubeRadius, tubeRadius,
             -sweptRadius - tubeRadius, sweptRadius + tubeRadius)
 
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
 
     public fun computeNormalAtPoint(p: Point3D): Normal3D {
         val paramSquared = sweptRadius*sweptRadius + tubeRadius*tubeRadius
@@ -44,7 +46,8 @@ class Torus(
         return Hit(
             tmin = t,
             localHitPoint = ray.origin + ray.direction*t,
-            normalAtHitPoint = computeNormalAtPoint(ray.origin + ray.direction*t))
+            normalAtHitPoint = computeNormalAtPoint(ray.origin + ray.direction*t),
+            material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

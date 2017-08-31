@@ -1,11 +1,9 @@
 package mc.raytracer
 
 import mc.raytracer.cameras.*
-import mc.raytracer.geometry.Cuboid
 import mc.raytracer.geometry.primitives.d3.Plane
-import mc.raytracer.geometry.compound.*
-import mc.raytracer.geometry.primitives.d3.Box
-import mc.raytracer.geometry.primitives.d3.Torus
+import mc.raytracer.geometry.compound.beveled.BeveledCylinder
+import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.lighting.*
 import mc.raytracer.material.*
 import mc.raytracer.math.*
@@ -107,46 +105,34 @@ class RayTracer {
         val rnd = Random()
         rnd.setSeed(12345)
 
-        enableAmbientOcclusion(false)
-        world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
-        world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 1.00))
+        enableAmbientOcclusion(true)
+        //world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.5))
+        //world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 1.00))
 
-        val floor = Plane(Point3D(0.0, -0.01, 0.0), Normal3D(0, 1, 0))
+        val floor = Plane(Point3D(0.0, -10.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 5.0)
-        //floor.material = MatteMaterial(RgbColor.white)
+        floor.material = MatteMaterial(RgbColor.white)
 
-        /*
+
         for (i in 1..30) {
-            val location = GlobalRandom.nextPoint(-300,300, 40,120, -300,300)
-            val radius = GlobalRandom.nextDouble(10.0, 30.0)
-
-            world.addObject(Sphere(location, radius).apply {
-                material = PhongMaterial(RgbColor.randomColor())
-            })
-        }*/
-
-        val torus = Torus(4.0, 1.0).apply {
-            material = MatteMaterial(RgbColor.red, ambientCoefficient = 0.1)
+            Sphere(Point3D.zero, 1.0)
+                    .newInstance()
+                    .translate(
+                            GlobalRandom.nextDouble(-10.0, 10.0),
+                            GlobalRandom.nextDouble(-10.0, 10.0),
+                            GlobalRandom.nextDouble(-10.0, 10.0))
+                    .create()
+                    .apply { material = PhongMaterial(RgbColor.white, ambientCoefficient = 1.0) }
+                    .let { world.addObject(it) }
         }
 
-        val box = Box(Point3D(-1,-1,-1), Point3D(1,1,1)).apply {
-            material = MatteMaterial(RgbColor.red)
-        }
-
-        world.addObject(box.newInstance()
-                .named("rotated red")
-                .scale(1.0, 1.0, 3.0)
-                .create())
-
-        world.addObject(box.newInstance()
-                .named("yellow")
-                .scale(3.0,1.0,1.0)
-                .create().apply {
-            material = MatteMaterial(RgbColor.yellow)
-        })
+        BeveledCylinder(-4.0, 4.0, 2.50, 0.30)
+                .newInstance()
+                .translate(dy=9.0)
+                .create()
+                .apply { material = PhongMaterial(RgbColor.orange) }
+                .let { world.addObject(it) }
 
         world.addObject(floor)
     }
-
-    fun cube(center: Point3D, size: Double) = Cuboid(center, size, size, size)
 }

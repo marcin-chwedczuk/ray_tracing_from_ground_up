@@ -16,10 +16,13 @@ open class PartTorus(
         val maxTubeAngle: Angle
 ) : GeometricObject() {
 
-    private val boundingBox = BoundingBox(
+    private val _boundingBox = BoundingBox(
             -sweptRadius - tubeRadius, sweptRadius + tubeRadius,
             -tubeRadius, tubeRadius,
             -sweptRadius - tubeRadius, sweptRadius + tubeRadius)
+
+    override val boundingBox: BoundingBox
+            get() = _boundingBox
 
     public fun computeNormalAtPoint(p: Point3D): Normal3D {
         val paramSquared = sweptRadius*sweptRadius + tubeRadius*tubeRadius
@@ -51,7 +54,8 @@ open class PartTorus(
         return Hit(
                 tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

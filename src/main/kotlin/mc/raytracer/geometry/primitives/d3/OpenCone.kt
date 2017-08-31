@@ -8,14 +8,22 @@ import mc.raytracer.math.EquationSolver
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 
 public class OpenCone(
-        val h: Double,
-        val r: Double
+        val height: Double,
+        val radius: Double
 ): GeometricObject() {
 
-    private val h2 = h*h
-    private val r2 = r*r
+    private val h2 = height * height
+    private val r2 = radius * radius
+
+    private val _boundingBox = BoundingBox.fromMinMaxPoints(
+            Point3D(-radius, 0.0, -radius),
+            Point3D(radius, height, radius))
+
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -31,15 +39,16 @@ public class OpenCone(
         return Hit(
                 tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     private fun computeNormal(hitPoint: Point3D): Normal3D {
-        val hr = h / r
+        val hr = height / radius
 
         return Normal3D(
                 hitPoint.x*hr*hr,
-                h - hitPoint.y,
+                height - hitPoint.y,
                 hitPoint.z*hr*hr)
     }
 
@@ -52,8 +61,8 @@ public class OpenCone(
         val dx = ray.direction.x; val dy = ray.direction.y; val dz = ray.direction.z
 
         val A = (h2/r2 * (dx*dx + dz*dz)) - dy*dy
-        val B = (h2/r2 * (2*ox*dx + 2*oz*dz)) - 2*dy*(oy-h)
-        val C = (h2/r2 * (ox*ox + oz*oz)) - (oy-h)*(oy-h)
+        val B = (h2/r2 * (2*ox*dx + 2*oz*dz)) - 2*dy*(oy- height)
+        val C = (h2/r2 * (ox*ox + oz*oz)) - (oy- height)*(oy- height)
 
         val solutions = EquationSolver.solveX2(listOf(C, B, A))
 
@@ -61,7 +70,7 @@ public class OpenCone(
                 .filter { it > K_EPSILON }
                 .filter {
                     val py = oy + it*dy
-                    val withinRange = (py > 0.0) && (py < h)
+                    val withinRange = (py > 0.0) && (py < height)
                     withinRange
                 }
                 .min()

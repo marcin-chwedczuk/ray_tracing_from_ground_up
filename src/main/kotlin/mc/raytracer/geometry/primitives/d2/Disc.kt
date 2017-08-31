@@ -4,6 +4,7 @@ import mc.raytracer.geometry.*
 import mc.raytracer.math.*
 import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.JitteredSampler
+import mc.raytracer.util.BoundingBox
 import mc.raytracer.util.LocalCoordinateSystem
 
 public class Disc(
@@ -24,6 +25,14 @@ public class Disc(
     private val area = PI * radius * radius
     private val invertedArea = 1.0 / area
 
+    private val _boundingBox = BoundingBox(
+            center.x - radius, center.x + radius,
+            center.y - radius, center.y + radius,
+            center.z - radius, center.z + radius)
+    
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
+
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
 
@@ -37,7 +46,8 @@ public class Disc(
         return Hit(
                 tmin = t,
                 localHitPoint = ray.origin + t*ray.direction,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

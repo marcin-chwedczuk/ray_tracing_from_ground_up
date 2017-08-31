@@ -68,11 +68,11 @@ class Vector3D(val x: Double, val y:Double, val z:Double) {
     // companion object ---------------------------------------
 
     companion object {
-        val zero = Vector3D(0,0,0)
+        public val zero = Vector3D(0,0,0)
 
-        val axisX = Vector3D(1,0,0)
-        val axisY = Vector3D(0,1,0)
-        val axisZ = Vector3D(0,0,1)
+        public val axisX = Vector3D(1,0,0)
+        public val axisY = Vector3D(0,1,0)
+        public val axisZ = Vector3D(0,0,1)
     }
 }
 

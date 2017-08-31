@@ -15,6 +15,19 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
         (y-other.y)*(y-other.y) +
         (z-other.z)*(z-other.z)
 
+    fun min(other: Point3D): Point3D
+        = Point3D(
+            Math.min(x, other.x),
+            Math.min(y, other.y),
+            Math.min(z, other.z))
+
+    fun max(other: Point3D): Point3D
+            = Point3D(
+            Math.max(x, other.x),
+            Math.max(y, other.y),
+            Math.max(z, other.z))
+
+
     override fun equals(other: Any?): Boolean {
         if (other !is Point3D)
             return false
@@ -59,7 +72,31 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
     // companion object ----------------------------------
 
     companion object {
-        val zero = Point3D(0.0, 0.0, 0.0)
+        public val zero = Point3D(0.0, 0.0, 0.0)
+
+        public fun min(points: List<Point3D>): Point3D {
+            if (points.isEmpty())
+                throw IllegalArgumentException("Cannot compute min from empty list of points.")
+
+            val max = Point3D(
+                    Double.MAX_VALUE,
+                    Double.MAX_VALUE,
+                    Double.MAX_VALUE)
+
+            return points.fold(max) { acc, curr -> acc.min(curr) }
+        }
+
+        public fun max(points: List<Point3D>): Point3D {
+            if (points.isEmpty())
+                throw IllegalArgumentException("Cannot compute max from empty list of points.")
+
+            val min = Point3D(
+                    Double.MIN_VALUE,
+                    Double.MIN_VALUE,
+                    Double.MIN_VALUE)
+
+            return points.fold(min) { acc, curr -> acc.max(curr) }
+        }
     }
 }
 

@@ -7,12 +7,15 @@ import mc.raytracer.geometry.Miss
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 
 class Plane(
         val a: Point3D,
         val normal: Normal3D)
     : GeometricObject() {
 
+    override val boundingBox: BoundingBox
+        get() = BoundingBox.INFINITE
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -20,7 +23,8 @@ class Plane(
         if (t >= K_EPSILON) {
             return Hit(tmin = t,
                     localHitPoint = ray.origin + ray.direction * t,
-                    normalAtHitPoint = normal)
+                    normalAtHitPoint = normal,
+                    material = material)
         }
 
         return Miss.instance

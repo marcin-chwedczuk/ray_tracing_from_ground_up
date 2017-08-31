@@ -21,10 +21,13 @@ class Sphere(
         sampler ?: UniformSphereSampler.fromSquareSampler(JitteredSampler())
     }
 
-    private val boundingBox: BoundingBox = BoundingBox(
+    private val _boundingBox: BoundingBox = BoundingBox(
             center.x - radius, center.x + radius,
             center.y - radius, center.y + radius,
             center.z - radius, center.z + radius)
+
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
 
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
@@ -36,7 +39,8 @@ class Sphere(
 
         return Hit(tmin = t,
                 localHitPoint = ray.pointOnRayPath(t),
-                normalAtHitPoint = Normal3D.fromVector(temp + ray.direction * t))
+                normalAtHitPoint = Normal3D.fromVector(temp + ray.direction * t),
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

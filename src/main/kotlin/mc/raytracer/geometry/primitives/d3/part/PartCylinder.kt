@@ -5,6 +5,7 @@ import mc.raytracer.geometry.Hit
 import mc.raytracer.geometry.HitResult
 import mc.raytracer.geometry.Miss
 import mc.raytracer.math.*
+import mc.raytracer.util.BoundingBox
 
 /**
  * Represents an part cylinder.
@@ -22,6 +23,13 @@ open class PartCylinder(
         val angleMax: Angle
 ): GeometricObject() {
 
+    private val _boundingBox = BoundingBox.fromMinMaxPoints(
+            Point3D(-radius, yBottom, -radius),
+            Point3D(radius, yTop, radius))
+
+    override val boundingBox: BoundingBox
+            get() = _boundingBox
+
     override fun hit(ray: Ray): HitResult {
         val tHitPointPair = findHitPoint(ray)
         if (tHitPointPair === null)
@@ -36,7 +44,8 @@ open class PartCylinder(
         return Hit(
                 tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(ray: Ray): Double? {

@@ -5,7 +5,9 @@ import mc.raytracer.geometry.Hit
 import mc.raytracer.geometry.HitResult
 import mc.raytracer.geometry.Miss
 import mc.raytracer.math.Normal3D
+import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 import java.lang.Math.sqrt
 
 class OpenCylinder(
@@ -13,6 +15,13 @@ class OpenCylinder(
         var yTop: Double,
         var radius: Double
 ): GeometricObject() {
+
+    private val _boundingBox = BoundingBox.fromMinMaxPoints(
+            Point3D(-radius, yBottom, -radius),
+            Point3D(radius, yTop, radius))
+
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
 
     override fun hit(ray: Ray): HitResult {
         val ox = ray.origin.x
@@ -46,7 +55,8 @@ class OpenCylinder(
                 return Hit(
                     tmin = t1,
                     localHitPoint = ray.origin + ray.direction*t1,
-                    normalAtHitPoint = normal)
+                    normalAtHitPoint = normal,
+                    material = material)
             }
         }
 
@@ -63,7 +73,8 @@ class OpenCylinder(
                 return Hit(
                     tmin = t2,
                     localHitPoint = ray.origin + ray.direction*t2,
-                    normalAtHitPoint = normal)
+                    normalAtHitPoint = normal,
+                    material = material)
             }
         }
 

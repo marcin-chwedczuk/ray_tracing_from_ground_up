@@ -57,7 +57,7 @@ class World(
                     hitPoint = ray.origin + ray.direction*tmin,
                     localHitPoint = hitMin.localHitPoint,
                     normalAtHitPoint = hitMin.normalAtHitPoint,
-                    material = objectMin!!.material,
+                    material = hitMin.material,
                     areaLightsDirection = Vector3D.zero,
                     ray = ray,
                     recursionDepth = depth,

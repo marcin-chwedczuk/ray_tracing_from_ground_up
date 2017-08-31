@@ -1,5 +1,6 @@
 package mc.raytracer.geometry.primitives.d2
 
+
 import mc.raytracer.geometry.GeometricObject
 import mc.raytracer.geometry.Hit
 import mc.raytracer.geometry.HitResult
@@ -7,6 +8,7 @@ import mc.raytracer.geometry.Miss
 import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.util.BoundingBox
 
 /**
  * Represents a triangle. Points {@code v0}, {@code v1}, {@code v2}
@@ -21,6 +23,10 @@ public class Triangle(
 
     public val normal: Normal3D = Normal3D.fromVector((v1 - v0) cross (v2 - v0))
 
+    private val _boundingBox = BoundingBox.containingPoints(v0, v1, v2)
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
+
     override fun hit(ray: Ray): HitResult {
         val t = computeIntersection(ray)
 
@@ -32,7 +38,8 @@ public class Triangle(
         return Hit(
                 tmin = t,
                 normalAtHitPoint = normal,
-                localHitPoint = ray.pointOnRayPath(t))
+                localHitPoint = ray.pointOnRayPath(t),
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

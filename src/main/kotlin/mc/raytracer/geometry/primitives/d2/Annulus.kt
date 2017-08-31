@@ -7,8 +7,12 @@ import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.sampling.CircleSampler
 import mc.raytracer.sampling.JitteredSampler
+import mc.raytracer.util.BoundingBox
 import mc.raytracer.util.LocalCoordinateSystem
 
+/**
+ * This is <em>one side</em> annulus.
+ */
 public class Annulus(
         val center: Point3D,
         val innerRadius: Double,
@@ -37,20 +41,25 @@ public class Annulus(
     private val invertedArea = 1.0 / area
     private val radiusDelta = outerRadius - innerRadius
 
+    private val _boundingBox = BoundingBox(
+            center.x - outerRadius, center.x + outerRadius,
+            center.y - outerRadius, center.y + outerRadius,
+            center.z - outerRadius, center.z + outerRadius)
+
+    override val boundingBox: BoundingBox
+        get() = _boundingBox
+
     override fun hit(ray: Ray): HitResult {
         val t = findIntersection(ray)
 
         if (t == null)
             return Miss.instance
 
-        // reverse normal if we are looking at the disk from the other side
-        // val n = if (-ray.direction dot normal > 0.0) normal else -normal
-        // don't revers when used as area light
-
         return Hit(
                 tmin = t,
                 localHitPoint = ray.pointOnRayPath(t),
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

@@ -27,6 +27,13 @@ public open class PartSphere(
     private val minAzimutCos = minAzimutAngle.cos()
     private val maxAzimutCos = maxAzimutAngle.cos()
 
+    private val _boundingBox = BoundingBox.fromMinMaxPoints(
+            Point3D(-radius, -radius, -radius),
+            Point3D(radius, radius, radius))
+
+    override val boundingBox: BoundingBox
+            get() = _boundingBox
+
     override fun hit(ray: Ray): HitResult {
         val tHitPointPair = findIntersection(ray)
         if (tHitPointPair === null)
@@ -40,7 +47,8 @@ public open class PartSphere(
 
         return Hit(tmin = t,
                 localHitPoint = hitPoint,
-                normalAtHitPoint = normal)
+                normalAtHitPoint = normal,
+                material = material)
     }
 
     override fun shadowHit(shadowRay: Ray): Double? {

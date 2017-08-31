@@ -6,24 +6,24 @@ import mc.raytracer.math.Normal3D
 import mc.raytracer.math.Point3D
 
 public class SolidCylinder(
-        val yMin: Double,
-        val yMax: Double,
+        val yBottom: Double,
+        val yTop: Double,
         val radius: Double
 ): BaseCompoundGeometricObject() {
 
     init {
         // bottom
         addObject(Disc(
-                Point3D(0.0,yMin,0.0),
+                Point3D(0.0,yBottom,0.0),
                 -Normal3D.axisY,
                 radius))
 
         // side
-        addObject(OpenCylinder(yMin, yMax, radius))
+        addObject(OpenCylinder(yBottom, yTop, radius))
 
         // top
         addObject(Disc(
-                Point3D(0.0,yMax,0.0),
+                Point3D(0.0,yTop,0.0),
                 Normal3D.axisY,
                 radius))
     }

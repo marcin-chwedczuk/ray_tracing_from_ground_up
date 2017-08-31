@@ -1,8 +1,10 @@
 package mc.raytracer.util
 
 import mc.raytracer.geometry.GeometricObject.Companion.K_EPSILON
+import mc.raytracer.math.Matrix4
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
+import mc.raytracer.math.Vector3D
 import java.lang.Math.max
 import java.lang.Math.min
 
@@ -68,4 +70,68 @@ class BoundingBox(
                (point.y in yMin..yMax) &&
                (point.z in zMin..zMax)
     }
+
+    fun merge(other: BoundingBox): BoundingBox {
+        if (other === EMPTY) return this
+        if (this === EMPTY) return other
+
+        return BoundingBox(
+                min(xMin, other.xMin), max(xMax, other.xMax),
+                min(yMin, other.yMin), max(yMax, other.yMax),
+                min(zMin, other.zMin), max(zMax, other.zMax))
+    }
+
+    fun computeVertices(): List<Point3D> =
+            listOf(
+                    Point3D(xMin, yMin, zMin),
+                    Point3D(xMax, yMin, zMin),
+                    Point3D(xMax, yMin, zMax),
+                    Point3D(xMin, yMin, zMax),
+
+                    Point3D(xMin, yMax, zMin),
+                    Point3D(xMax, yMax, zMin),
+                    Point3D(xMax, yMax, zMax),
+                    Point3D(xMin, yMax, zMax))
+
+    fun transform(matrix: Matrix4): BoundingBox {
+        val transformedVertices = computeVertices()
+                .map { point -> matrix*point }
+
+        return containingPoints(transformedVertices)
+    }
+
+    companion object {
+        private val DELTA = 1e-6
+        private val DELTA_VECTOR = Vector3D(DELTA, DELTA, DELTA)
+
+        public val INFINITE = BoundingBox(
+                Double.MIN_VALUE, Double.MAX_VALUE,
+                Double.MIN_VALUE, Double.MAX_VALUE,
+                Double.MIN_VALUE, Double.MAX_VALUE)
+
+        public val EMPTY = BoundingBox(
+                0.0, 0.0,
+                0.0, 0.0,
+                0.0, 0.0)
+
+        public fun containingPoints(vararg points: Point3D): BoundingBox {
+            return containingPoints(points.toList())
+        }
+
+        public fun containingPoints(points: List<Point3D>): BoundingBox {
+            val minPoint = Point3D.min(points)
+            val maxPoint = Point3D.max(points)
+
+            return fromMinMaxPoints(minPoint, maxPoint)
+        }
+
+        public fun fromMinMaxPoints(minPoint: Point3D, maxPoint: Point3D): BoundingBox {
+            return BoundingBox(
+                    minPoint.x, maxPoint.x,
+                    minPoint.y, maxPoint.y,
+                    minPoint.z, maxPoint.z)
+        }
+    }
+
+
 }
