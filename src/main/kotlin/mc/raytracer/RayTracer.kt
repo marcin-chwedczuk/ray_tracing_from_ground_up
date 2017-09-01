@@ -1,6 +1,7 @@
 package mc.raytracer
 
 import mc.raytracer.cameras.*
+import mc.raytracer.geometry.acceleration.AccelerationGrid
 import mc.raytracer.geometry.primitives.d3.Plane
 import mc.raytracer.geometry.compound.beveled.BeveledCylinder
 import mc.raytracer.geometry.primitives.d3.Sphere
@@ -105,33 +106,33 @@ class RayTracer {
         val rnd = Random()
         rnd.setSeed(12345)
 
-        enableAmbientOcclusion(true)
-        //world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.5))
-        //world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.orange, radianceScalingFactor = 1.00))
+        enableAmbientOcclusion(false)
+        world.addLight(DirectionalLight(Vector3D(0,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
+        world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.white, radianceScalingFactor = 1.00))
 
         val floor = Plane(Point3D(0.0, -10.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 5.0)
         floor.material = MatteMaterial(RgbColor.white)
 
 
-        for (i in 1..30) {
+        val grid = AccelerationGrid(multiplier = 5)
+        val span = 7.0
+        for (i in 1..1) {
             Sphere(Point3D.zero, 1.0)
                     .newInstance()
                     .translate(
-                            GlobalRandom.nextDouble(-10.0, 10.0),
-                            GlobalRandom.nextDouble(-10.0, 10.0),
-                            GlobalRandom.nextDouble(-10.0, 10.0))
+                            GlobalRandom.nextDouble(-span, span),
+                            GlobalRandom.nextDouble(-span, span),
+                            GlobalRandom.nextDouble(-span, span))
                     .create()
-                    .apply { material = PhongMaterial(RgbColor.white, ambientCoefficient = 1.0) }
-                    .let { world.addObject(it) }
+                    .apply { material = PhongMaterial(RgbColor.randomColor()) }
+                    .let {
+                        grid.addObject(it)
+                    }
         }
 
-        BeveledCylinder(-4.0, 4.0, 2.50, 0.30)
-                .newInstance()
-                .translate(dy=9.0)
-                .create()
-                .apply { material = PhongMaterial(RgbColor.orange) }
-                .let { world.addObject(it) }
+        grid.initialize()
+        world.addObject(grid)
 
         world.addObject(floor)
     }

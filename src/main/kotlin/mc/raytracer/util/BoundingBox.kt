@@ -19,6 +19,10 @@ class BoundingBox(
         if (zMin > zMax) throw IllegalArgumentException("zMin cannot be greater than zMax")
     }
 
+    public val dx = xMax - xMin
+    public val dy = yMax - yMin
+    public val dz = zMax - zMin
+
     fun isIntersecting(ray: Ray): Boolean {
         val ox = ray.origin.x;    val oy = ray.origin.y; 	val oz = ray.origin.z
 	    val dx = ray.direction.x; val dy = ray.direction.y; val dz = ray.direction.z

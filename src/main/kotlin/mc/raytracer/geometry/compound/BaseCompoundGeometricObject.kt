@@ -12,6 +12,9 @@ public open class BaseCompoundGeometricObject: GeometricObject() {
     private val geometricObjects = mutableListOf<GeometricObject>()
     private var _boundingBox = BoundingBox.EMPTY
 
+    public val size: Int
+            get() = geometricObjects.size
+
     public override val boundingBox: BoundingBox
             get() = _boundingBox
 

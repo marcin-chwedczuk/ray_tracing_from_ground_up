@@ -91,9 +91,9 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
                 throw IllegalArgumentException("Cannot compute max from empty list of points.")
 
             val min = Point3D(
-                    Double.MIN_VALUE,
-                    Double.MIN_VALUE,
-                    Double.MIN_VALUE)
+                    -Double.MAX_VALUE,
+                    -Double.MAX_VALUE,
+                    -Double.MAX_VALUE)
 
             return points.fold(min) { acc, curr -> acc.max(curr) }
         }
