@@ -11,6 +11,8 @@ class Ray private constructor(
     // Light computations requires that direction is always a unit vector,
     // but this is done after transformation so transformed ray is not used.
 
+    public val unitDirection = direction.norm()
+
     fun pointOnRayPath(t: Double): Point3D {
         return origin + direction*t
     }

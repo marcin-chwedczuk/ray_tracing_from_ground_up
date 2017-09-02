@@ -17,7 +17,7 @@ public class MatteMaterial(
     override fun shade(info: ShadingInfo): RgbColor {
         val world = info.world
 
-        val wo = -info.ray.direction
+        val wo = -info.ray.unitDirection
         var L = world.ambientLight.radiance(info) * ambientBrdf.rho(info, wo)
 
         for(light in world.lights) {
@@ -46,7 +46,7 @@ public class MatteMaterial(
     override fun areaLightShade(info: ShadingInfo): RgbColor {
         val world = info.world
 
-        val wo = -info.ray.direction
+        val wo = -info.ray.unitDirection
         var L = world.ambientLight.radiance(info) * ambientBrdf.rho(info, wo)
 
         for(light in world.lights) {

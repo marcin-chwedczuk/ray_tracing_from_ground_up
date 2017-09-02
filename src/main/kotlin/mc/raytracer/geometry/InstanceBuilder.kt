@@ -39,6 +39,10 @@ public class InstanceBuilder(
         return this
     }
 
+    public fun scale(s: Double): InstanceBuilder {
+        return scale(s, s, s)
+    }
+
     public fun scale(sx: Double, sy: Double, sz: Double): InstanceBuilder {
         matrix = Matrix4.scale(sx, sy, sz) * matrix
         matrixInverse *= Matrix4.scaleInverse(sx, sy, sz)

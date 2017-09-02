@@ -73,6 +73,7 @@ class Point3D(val x: Double, val y: Double, val z: Double) {
 
     companion object {
         public val zero = Point3D(0.0, 0.0, 0.0)
+        public val one = Point3D(1.0, 1.0, 1.0)
 
         public fun min(points: List<Point3D>): Point3D {
             if (points.isEmpty())

@@ -40,9 +40,12 @@ public class AccelerationGrid(
     }
 
     private fun computeBoundingBox(): BoundingBox {
+        val BOX_DELTA = 1e-6
+
         return geometricObjects
                 .map { it.boundingBox }
                 .fold(BoundingBox.EMPTY) { acc, elem -> acc.merge(elem) }
+                .extend(BOX_DELTA)
     }
 
     private fun setupCells() {
@@ -118,14 +121,22 @@ public class AccelerationGrid(
     override val boundingBox: BoundingBox
         get() = _boundingBox
 
-    override fun hit(ray: Ray): HitResult {
+
+    private inline fun <HIT_RESULT> hitAlgorithmTemplate(
+            tryHit: (GeometricObject?, Ray) -> HIT_RESULT,
+            isHit: (HIT_RESULT) -> Boolean,
+            extractT: (HIT_RESULT) -> Double,
+            missResult: HIT_RESULT,
+            ray: Ray
+    ): HIT_RESULT {
+
         assertInitialized()
 
         // INTERSECT RAY WITH THE BOUNDING BOX AND OBTAIN MIN_T -----------------------
         val origin = ray.origin
         val direction = ray.direction
 
-	    // the following code includes modifications from Shirley and Morley (2003)
+        // the following code includes modifications from Shirley and Morley (2003)
         val a = 1.0 / direction.x
 
         val tx_min:Double; val tx_max: Double
@@ -167,9 +178,9 @@ public class AccelerationGrid(
 
         // NO INTERSECTION
         if (t0 > t1)
-            return Miss.instance
+            return missResult
 
-	    // COMPUTE RAY START IN GRID -----------------------------------
+        // COMPUTE RAY START IN GRID -----------------------------------
 
         // ix,iy,iz - indexes of the first cell on ray way into the grid
         var ix: Int; var iy: Int; var iz: Int
@@ -248,10 +259,10 @@ public class AccelerationGrid(
 
         while (true) {
             val obj = getCell(ix, iy, iz)
-            val hitResult = obj?.hit(ray) ?: Miss.instance
+            val hitResult: HIT_RESULT = tryHit(obj, ray)
 
             if (tx_next < ty_next && tx_next < tz_next) {
-                if ((hitResult is Hit) && (hitResult.tmin < tx_next)) {
+                if (isHit(hitResult) && (extractT(hitResult) < tx_next)) {
                     return hitResult
                 }
 
@@ -259,10 +270,10 @@ public class AccelerationGrid(
                 ix += ix_step
 
                 if (ix == ix_stop)
-                    return Miss.instance
+                    return missResult
 
             } else if (ty_next < tz_next) {
-                if ((hitResult is Hit) && (hitResult.tmin < ty_next)) {
+                if (isHit(hitResult) && (extractT(hitResult) < ty_next)) {
                     return hitResult
                 }
 
@@ -270,10 +281,10 @@ public class AccelerationGrid(
                 iy += iy_step
 
                 if (iy == iy_stop)
-                    return Miss.instance
+                    return missResult
 
             } else {
-                if ((hitResult is Hit) && (hitResult.tmin < tz_next)) {
+                if (isHit(hitResult) && (extractT(hitResult) < tz_next)) {
                     return hitResult
                 }
 
@@ -281,17 +292,27 @@ public class AccelerationGrid(
                 iz += iz_step
 
                 if (iz == iz_stop)
-                    return Miss.instance
+                    return missResult
             }
         }
     }
 
-    override fun shadowHit(shadowRay: Ray): Double? {
-        assertInitialized()
+    override fun hit(ray: Ray): HitResult {
+        return hitAlgorithmTemplate<HitResult>(
+                { obj, r -> obj?.hit(r) ?: Miss.instance },
+                { hitResult -> (hitResult is Hit) },
+                { hitResult -> (hitResult as Hit).tmin },
+                Miss.instance,
+                ray)
+    }
 
-        // TODO: Refactor
-        val hit = hit(shadowRay)
-        return (hit as? Hit)?.tmin
+    override fun shadowHit(shadowRay: Ray): Double? {
+        return hitAlgorithmTemplate<Double?>(
+                { obj, r -> obj?.shadowHit(r) },
+                { hitResult -> (hitResult !== null) },
+                { hitResult -> hitResult!! },
+                null,
+                shadowRay)
     }
 
     private fun assertInitialized() {

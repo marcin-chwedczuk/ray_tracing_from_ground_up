@@ -85,6 +85,13 @@ class BoundingBox(
                 min(zMin, other.zMin), max(zMax, other.zMax))
     }
 
+    fun extend(delta: Double): BoundingBox {
+        return BoundingBox(
+                xMin-delta, xMax+delta,
+                yMin-delta, yMax+delta,
+                zMin-delta, zMax+delta)
+    }
+
     fun computeVertices(): List<Point3D> =
             listOf(
                     Point3D(xMin, yMin, zMin),
@@ -105,8 +112,6 @@ class BoundingBox(
     }
 
     companion object {
-        private val DELTA = 1e-6
-        private val DELTA_VECTOR = Vector3D(DELTA, DELTA, DELTA)
 
         public val INFINITE = BoundingBox(
                 Double.MIN_VALUE, Double.MAX_VALUE,
