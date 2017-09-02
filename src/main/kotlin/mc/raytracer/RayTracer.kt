@@ -4,6 +4,7 @@ import mc.raytracer.cameras.*
 import mc.raytracer.geometry.acceleration.AccelerationGrid
 import mc.raytracer.geometry.primitives.d3.Plane
 import mc.raytracer.geometry.compound.beveled.BeveledCylinder
+import mc.raytracer.geometry.mesh.TessellatedSphere
 import mc.raytracer.geometry.primitives.d3.Box
 import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.lighting.*
@@ -107,43 +108,24 @@ class RayTracer {
         val rnd = Random()
         rnd.setSeed(12345)
 
-        enableAmbientOcclusion(true)
-        //world.addLight(DirectionalLight(Vector3D(-1,-1,0), RgbColor.white, radianceScalingFactor = 1.0))
+        enableAmbientOcclusion(false)
+        world.addLight(DirectionalLight(Vector3D(-1,0,0), RgbColor.white, radianceScalingFactor = 1.0))
         //world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.white, radianceScalingFactor = 1.00))
+        world.addLight(PointLight(Point3D(0.2,-0.8,0.1), RgbColor.white))
+        //world.addObject(Sphere(Point3D(0.2,-0.8,0.1), 0.2))
 
         val floor = Plane(Point3D(0.0, -1.01, 0.0), Normal3D(0, 1, 0))
         floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 5.0)
-        floor.material = MatteMaterial(RgbColor.white, ambientCoefficient = 0.9)
+        //floor.material = MatteMaterial(RgbColor.white)
 
         val grid = AccelerationGrid(multiplier = 5)
 
-        val BOX_SIZE = 7.0
-        val PADDING = 3.0
-        val N = 0
+        TessellatedSphere(3, 2, PhongMaterial(RgbColor.red)).addTrianglesToGrid(grid)
+        grid.forEachObject { world.addObject(it) }
 
-        for (xi in -N/2..N/2) {
-            for(yi in -N/2..N/2) {
-                for (zi in -N/2..N/2) {
-                    val pos = Point3D(xi*BOX_SIZE, yi*BOX_SIZE, zi*BOX_SIZE)
-                    val size = Vector3D(BOX_SIZE-PADDING, BOX_SIZE-PADDING, BOX_SIZE-PADDING)
-
-                    Box(pos-size/2.0,pos+size/2.0)
-                            .newInstance()
-                            .translate(pos.x, pos.y, pos.z)
-                            .create()
-                            .apply {
-                                material = PhongMaterial(RgbColor.white, ambientCoefficient = 1.0)
-                            }
-                            .let {
-                                grid.addObject(it)
-                            }
-
-                }
-            }
-        }
 
         grid.initialize()
-        world.addObject(grid)
+        //world.addObject(grid)
 
         world.addObject(floor)
     }

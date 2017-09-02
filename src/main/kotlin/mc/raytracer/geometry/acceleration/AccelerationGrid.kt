@@ -28,6 +28,11 @@ public class AccelerationGrid(
         geometricObjects.add(obj)
     }
 
+    public fun forEachObject(func: (GeometricObject)->Unit) {
+        for(obj in geometricObjects)
+            func(obj)
+    }
+
     public fun initialize() {
         _boundingBox = computeBoundingBox()
         setupCells()
