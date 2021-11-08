@@ -104,28 +104,32 @@ class RayTracer {
         camera.render(world, canvas, cancelFlag)
     }
 
+
+
     fun buildWorld() {
         val rnd = Random()
         rnd.setSeed(12345)
 
         enableAmbientOcclusion(false)
-        world.addLight(DirectionalLight(Vector3D(-1,0,0), RgbColor.white, radianceScalingFactor = 1.0))
-        //world.addLight(DirectionalLight(Vector3D(0.0,-1.0,-1.0), RgbColor.white, radianceScalingFactor = 1.00))
-        world.addLight(PointLight(Point3D(0.2,-0.8,0.1), RgbColor.white))
-        //world.addObject(Sphere(Point3D(0.2,-0.8,0.1), 0.2))
+        //world.addLight(DirectionalLight(Vector3D(-1,0,0), RgbColor.white, radianceScalingFactor = 1.0))
+        world.addLight(DirectionalLight(Vector3D(-1.0,-1.0,-1.0), RgbColor.white, radianceScalingFactor = 1.00))
+        //world.addLight(PointLight(Point3D(0.2,-0.8,0.1), RgbColor.white))
+        val s = Sphere(Point3D(0.2,4.8,0.1), 7.2)
+        s.material = MatteMaterial(RgbColor.orange)
+        world.addObject(s)
 
         val floor = Plane(Point3D(0.0, -1.01, 0.0), Normal3D(0, 1, 0))
-        floor.material = ChessboardMaterial(RgbColor.grayscale(0.97), RgbColor.black, patternSize = 5.0)
-        //floor.material = MatteMaterial(RgbColor.white)
+        floor.material = ChessboardMaterial(RgbColor.white, RgbColor.black, patternSize = 5.0)
+        // floor.material = MatteMaterial(RgbColor.white)
 
+        /*
         val grid = AccelerationGrid(multiplier = 5)
 
-        TessellatedSphere(3, 2, PhongMaterial(RgbColor.red)).addTrianglesToGrid(grid)
+        TessellatedSphere(6, 7, PhongMaterial(RgbColor.red)).addTrianglesToGrid(grid)
         grid.forEachObject { world.addObject(it) }
 
-
         grid.initialize()
-        //world.addObject(grid)
+        world.addObject(grid)*/
 
         world.addObject(floor)
     }
