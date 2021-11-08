@@ -1,7 +1,9 @@
 package mc.raytracer.math
 
-import org.junit.Test
-import kotlin.test.assertTrue
+
+import org.junit.jupiter.api.Test
+import assertk.assertThat
+import assertk.assertions.*
 
 class Point3DTest {
 
@@ -32,8 +34,11 @@ class Point3DTest {
         val p2 = Point3D(1,2,3)
         val p3 = Point3D(1.1,2.0,3.0)
 
-        assertTrue(p1.equals(p2), "p1 == p2")
-        assertTrue(!p1.equals(p3), "p1 != p3")
+        assertThat(p1)
+            .isEqualTo(p2)
+
+        assertThat(p1)
+            .isNotEqualTo(p3)
     }
 
     @Test

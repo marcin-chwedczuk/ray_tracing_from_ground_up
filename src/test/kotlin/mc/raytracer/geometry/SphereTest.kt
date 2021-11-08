@@ -4,11 +4,11 @@ import mc.raytracer.geometry.primitives.d3.Sphere
 import mc.raytracer.math.Point3D
 import mc.raytracer.math.Ray
 import mc.raytracer.math.Vector3D
-import org.junit.Test
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import assertk.assertThat
+import assertk.assertions.*
 
 class SphereTest {
-
     @Test
     fun hitWorks() {
         val sphere = Sphere(Point3D(0, 0, 0), 10.0)
@@ -16,6 +16,7 @@ class SphereTest {
 
         val result = sphere.hit(ray)
 
-        assertTrue(result is Hit)
+        assertThat(result)
+            .isInstanceOf(Hit::class)
     }
 }

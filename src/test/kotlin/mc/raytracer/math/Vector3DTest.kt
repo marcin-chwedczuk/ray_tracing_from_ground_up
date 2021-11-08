@@ -1,6 +1,8 @@
 package mc.raytracer.math
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
+
+import kotlin.math.sqrt
 
 class Vector3DTest {
     @Test
@@ -26,9 +28,11 @@ class Vector3DTest {
     @Test
     fun dotWithNormalWorks() {
         val a = Vector3D(1,2,3)
+        // Normal is automatically normalized
         val b = Normal3D(4,-5,6)
+        val bLengthBeforeNormalization = sqrt(4.0*4 + (-5)*(-5) + 6*6)
 
-        assertEquals(12.0, a.dot(b))
+        assertEquals(12.0 / bLengthBeforeNormalization, a.dot(b))
     }
 
     @Test

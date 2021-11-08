@@ -1,10 +1,7 @@
 package mc.raytracer
 
 import mc.raytracer.util.RawBitmap
-import org.junit.Test
-import java.util.*
-import kotlin.collections.HashSet
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Test
 
 class Test {
     @Test

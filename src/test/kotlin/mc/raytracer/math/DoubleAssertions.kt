@@ -1,6 +1,6 @@
 package mc.raytracer.math
 
-import kotlin.test.fail
+import org.junit.jupiter.api.fail
 
 fun assertEquals(expected: Double, actual: Double,
                  epsilon: Double = 1e-8, message: String = "") {
