@@ -91,7 +91,7 @@ class Torus(
         // the roots array is not sorted
         val t: Double? = solution
                 .filter { it > K_EPSILON }
-                .min()
+                .minOrNull()
 
         return t
     }

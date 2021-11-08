@@ -73,7 +73,7 @@ public class OpenCone(
                     val withinRange = (py > 0.0) && (py < height)
                     withinRange
                 }
-                .min()
+                .minOrNull()
 
         if (t === null)
             return null

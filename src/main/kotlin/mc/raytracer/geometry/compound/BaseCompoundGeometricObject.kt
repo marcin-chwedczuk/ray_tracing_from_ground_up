@@ -44,7 +44,7 @@ public open class BaseCompoundGeometricObject: GeometricObject() {
         return geometricObjects
                 .map { it.hit(ray) }
                 .filterIsInstance<Hit>()
-                .minBy { it.tmin }
+                .minByOrNull { it.tmin }
                 ?: Miss.instance
     }
 
@@ -55,6 +55,6 @@ public open class BaseCompoundGeometricObject: GeometricObject() {
 
         return geometricObjects
                 .mapNotNull { it.shadowHit(shadowRay) }
-                .minBy { it }
+                .minByOrNull { it }
     }
 }
